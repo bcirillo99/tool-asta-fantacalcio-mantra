@@ -244,6 +244,16 @@ let pullForward = false;   // true = riempi slot offensivi vuoti tirando avanti 
 const ROLE_ORDER = ["Por","Dc","B","Dd","Ds","E","M","C","W","T","A","Pc"];
 const ri = r => ROLE_ORDER.indexOf(r);
 
+// Colore per reparto (toni chiari, leggibili su sfondo scuro).
+const ROLE_COLORS = {
+  Por:"#fbbf24",                                   // portiere → arancione
+  Dc:"#4ade80", B:"#4ade80", Dd:"#4ade80", Ds:"#4ade80", // difensori → verde
+  E:"#60a5fa",  M:"#60a5fa", C:"#60a5fa",          // centrocampo → blu
+  W:"#c084fc",  T:"#c084fc",                        // ali/trequarti → viola
+  A:"#f87171",  Pc:"#f87171",                       // attaccanti → rosso
+};
+const roleColor = r => ROLE_COLORS[r] || "#9ca3af";
+
 function roles(p) { return (p.RM||"").split(";").map(s=>s.trim()).filter(Boolean); }
 function primaryRole(p) {
   return roles(p).sort((a,b) => ri(a)-ri(b))[0] || "?";
@@ -526,6 +536,7 @@ function renderPitch() {
     el.style.top  = slot.y + "%";
 
     const slotLabel = slot.roles.join("/");
+    const col       = roleColor(slot.roles[0]);   // colore reparto dello slot
 
     const roleTag = document.createElement("div");
     roleTag.className = "pslot-role";
@@ -537,8 +548,13 @@ function renderPitch() {
     if (sp) {
       const nm = sp.player.Nome.split(/[\s\-\.]/)[0];
       circ.textContent = nm.length > 7 ? nm.slice(0,6)+"." : nm;
+      circ.style.color = col;
+      // il bordo resta ai badge Rigorista/Nuovo se presenti, altrimenti colore ruolo
+      if (!el.classList.contains("rig1") && !el.classList.contains("nuovo"))
+        circ.style.borderColor = col;
     } else {
       circ.textContent = slotLabel;
+      circ.style.color = col;
     }
     el.appendChild(circ);
 
@@ -607,9 +623,11 @@ function renderRoster() {
       const rigBadge  = p.Rigorista > 0 ? `<span class="rp-rig">R${p.Rigorista}</span> ` : "";
       const newBadge  = p.Nuovo_Arrivo==="True" ? `<span class="rp-new">NEW</span> ` : "";
       const fm        = p.Fm_2526 && !isNaN(p.Fm_2526) ? `Fm:${parseFloat(p.Fm_2526).toFixed(1)}` : "—";
+      const pr        = primaryRole(p);
+      const col       = roleColor(pr);
 
       el.innerHTML = `
-        <div class="rp-badge">${primaryRole(p)}</div>
+        <div class="rp-badge" style="color:${col};background:${col}22">${pr}</div>
         <div class="rp-info">
           <div class="rp-name">${rigBadge}${newBadge}${p.Nome}</div>
           <div class="rp-sub">${p.Squadra} · ${p.RM} · ${fm}</div>
