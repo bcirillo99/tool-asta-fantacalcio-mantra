@@ -64,6 +64,8 @@ body { font-family: 'Segoe UI', sans-serif; background: #111827; color: #e5e7eb;
 .rp-name { font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rp-sub { font-size: 9px; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rp-price { font-size: 13px; font-weight: 700; color: #f59e0b; white-space: nowrap; }
+.rp-role { flex-shrink: 0; background: #111827; color: #d1d5db; border: 1px solid #374151; border-radius: 5px; font-size: 10px; padding: 2px 3px; cursor: pointer; }
+.rp-role:hover { border-color: #3b82f6; }
 .rp-del { color: #ef4444; cursor: pointer; font-size: 16px; padding: 0 2px; line-height: 1; flex-shrink: 0; }
 .rp-del:hover { color: #fca5a5; }
 .rp-rig { font-size: 8px; color: #fcd34d; }
@@ -359,13 +361,16 @@ function assign(squadList, f) {
   // Es. B;Dd;E in un 3-difese (slot Dc,Dc,Dc/B): unico ruolo-slot coperto = B → target B.
   // Il giocatore competerà SOLO per gli slot che accettano il suo target, mai per uno
   // più offensivo. Così un secondo B;Dd;E finisce riserva di B, non titolare a E.
-  function targetRole(p) {
-    const pr = roles(p).sort((a,b) => ri(a) - ri(b));
+  // Ruoli effettivi: se l'utente ha forzato un ruolo (sp.forced), il giocatore è mono-ruolo.
+  const spRoles = sp => sp.forced ? [sp.forced] : roles(sp.player);
+
+  function targetRole(sp) {
+    const pr = spRoles(sp).sort((a,b) => ri(a) - ri(b));
     for (const r of pr) if (formRoles.has(r)) return r;
     return null; // nessuno slot naturale nel modulo
   }
   function eligible(sp, slot) {
-    const t = targetRole(sp.player);
+    const t = targetRole(sp);
     return t !== null && slot.roles.includes(t);
   }
 
@@ -374,7 +379,7 @@ function assign(squadList, f) {
   // in slot A/Pc un Pc (Lautaro) e un A (Berardi) sono entrambi naturali (waste 0),
   // quindi decide la QtA → titolare il più forte, non il "più difensivo".
   function waste(sp, slot) {
-    const pr = roles(sp.player).sort((a,b) => ri(a) - ri(b));
+    const pr = spRoles(sp).sort((a,b) => ri(a) - ri(b));
     for (let i = 0; i < pr.length; i++) if (slot.roles.includes(pr[i])) return i;
     return 99;
   }
@@ -452,7 +457,7 @@ function assign(squadList, f) {
   // (waste minimo, poi slot più difensivo). Niente duplicati tra slot uguali/sovrapposti.
   const reserves = slots.map(() => []);
   squadList
-    .filter(sp => !used.has(sp) && targetRole(sp.player) !== null)
+    .filter(sp => !used.has(sp) && targetRole(sp) !== null)
     .forEach(sp => {
       let bi = -1, bw = 99, br = 99;
       slots.forEach((slot, i) => {
@@ -474,7 +479,7 @@ function assign(squadList, f) {
 
   // Senza slot: chi non ha alcun ruolo-slot nel modulo
   const noSlot = squadList.filter(sp =>
-    !used.has(sp) && targetRole(sp.player) === null
+    !used.has(sp) && targetRole(sp) === null
   );
 
   return { assigned: result, reserves, noSlot };
@@ -623,8 +628,16 @@ function renderRoster() {
       const rigBadge  = p.Rigorista > 0 ? `<span class="rp-rig">R${p.Rigorista}</span> ` : "";
       const newBadge  = p.Nuovo_Arrivo==="True" ? `<span class="rp-new">NEW</span> ` : "";
       const fm        = p.Fm_2526 && !isNaN(p.Fm_2526) ? `Fm:${parseFloat(p.Fm_2526).toFixed(1)}` : "—";
-      const pr        = primaryRole(p);
+      const rl        = roles(p);
+      const pr        = sp.forced || primaryRole(p);   // badge riflette il ruolo forzato
       const col       = roleColor(pr);
+
+      // Dropdown ruolo solo per i multi-ruolo: Auto + ogni ruolo del giocatore.
+      const roleSel = rl.length > 1 ? `
+        <select class="rp-role" title="Schiera come (Auto = più difensivo)">
+          <option value="">Auto</option>
+          ${rl.map(r => `<option value="${r}" ${sp.forced===r?"selected":""}>${r}</option>`).join("")}
+        </select>` : "";
 
       el.innerHTML = `
         <div class="rp-badge" style="color:${col};background:${col}22">${pr}</div>
@@ -632,11 +645,18 @@ function renderRoster() {
           <div class="rp-name">${rigBadge}${newBadge}${p.Nome}</div>
           <div class="rp-sub">${p.Squadra} · ${p.RM} · ${fm}</div>
         </div>
+        ${roleSel}
         <div class="rp-price">${sp.price}Cr</div>
         <div class="rp-del" data-idx="${idx}">×</div>
       `;
       el.querySelector(".rp-del").addEventListener("click", e => {
         squad.splice(parseInt(e.target.dataset.idx), 1);
+        save(); renderRoster(); renderPitch();
+      });
+      const sel = el.querySelector(".rp-role");
+      if (sel) sel.addEventListener("change", e => {
+        e.stopPropagation();
+        sp.forced = e.target.value || null;
         save(); renderRoster(); renderPitch();
       });
       list.appendChild(el);
