@@ -64,6 +64,8 @@ body { font-family: 'Segoe UI', sans-serif; background: #111827; color: #e5e7eb;
 .rp-name { font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rp-sub { font-size: 9px; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rp-price { font-size: 13px; font-weight: 700; color: #f59e0b; white-space: nowrap; }
+#export-btn { margin-top: 6px; width: 100%; background: #065f46; color: #d1fae5; border: 1px solid #047857; border-radius: 6px; padding: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+#export-btn:hover { background: #047857; }
 .rp-role { flex-shrink: 0; background: #111827; color: #d1d5db; border: 1px solid #374151; border-radius: 5px; font-size: 10px; padding: 2px 3px; cursor: pointer; }
 .rp-role:hover { border-color: #3b82f6; }
 .rp-del { color: #ef4444; cursor: pointer; font-size: 16px; padding: 0 2px; line-height: 1; flex-shrink: 0; }
@@ -166,6 +168,7 @@ body { font-family: 'Segoe UI', sans-serif; background: #111827; color: #e5e7eb;
     <h1>⚽ FANTACALCIO MANTRA 26/27</h1>
     <input type="file" id="file-input" accept=".csv">
     <div id="file-status">Carica riassuntivo_asta_2627.csv</div>
+    <button id="export-btn">⬇ Esporta squadra CSV</button>
   </div>
 
   <div id="search-area">
@@ -175,7 +178,7 @@ body { font-family: 'Segoe UI', sans-serif; background: #111827; color: #e5e7eb;
 
   <div id="budget-bar">
     <div class="bud-item">
-      <div class="bud-val"><input id="budget-input" type="number" value="250"> Cr</div>
+      <div class="bud-val"><input id="budget-input" type="number" value="250"> FM</div>
       <div class="bud-lbl">BUDGET</div>
     </div>
     <div class="bud-item">
@@ -224,7 +227,7 @@ body { font-family: 'Segoe UI', sans-serif; background: #111827; color: #e5e7eb;
     <div id="modal-title"></div>
     <div id="modal-sub"></div>
     <div id="modal-stats"></div>
-    <input id="price-input" type="number" min="1" max="999" placeholder="Prezzo pagato (Cr)">
+    <input id="price-input" type="number" min="1" max="999" placeholder="Prezzo pagato (FM)">
     <div class="mbts">
       <button id="btn-ok">✓ Aggiungi</button>
       <button id="btn-no">✕ Annulla</button>
@@ -571,7 +574,7 @@ function renderPitch() {
 
       const prEl = document.createElement("div");
       prEl.className = "pslot-price";
-      prEl.textContent = sp.price + " Cr";
+      prEl.textContent = sp.price + " FM";
       el.appendChild(prEl);
     }
 
@@ -583,7 +586,7 @@ function renderPitch() {
       res.forEach(rsp => {
         const r = document.createElement("div");
         r.className = "pslot-res";
-        r.textContent = rsp.player.Nome.split(" ")[0] + " " + rsp.price + "Cr";
+        r.textContent = rsp.player.Nome.split(" ")[0] + " " + rsp.price + "FM";
         r.title = rsp.player.Nome + " · " + rsp.player.RM + " · Qt.A " + rsp.player.QtA;
         resWrap.appendChild(r);
       });
@@ -605,7 +608,7 @@ function renderPitch() {
   noSlot.forEach(sp => {
     const el = document.createElement("div");
     el.className = "bp";
-    el.innerHTML = `<span class="bp-role">${primaryRole(sp.player)}</span>${sp.player.Nome} <span class="bp-price">${sp.price}Cr</span>`;
+    el.innerHTML = `<span class="bp-role">${primaryRole(sp.player)}</span>${sp.player.Nome} <span class="bp-price">${sp.price}FM</span>`;
     benchEl.appendChild(el);
   });
 }
@@ -646,7 +649,7 @@ function renderRoster() {
           <div class="rp-sub">${p.Squadra} · ${p.RM} · ${fm}</div>
         </div>
         ${roleSel}
-        <div class="rp-price">${sp.price}Cr</div>
+        <div class="rp-price">${sp.price}FM</div>
         <div class="rp-del" data-idx="${idx}">×</div>
       `;
       el.querySelector(".rp-del").addEventListener("click", e => {
@@ -701,7 +704,7 @@ searchIn.addEventListener("input", () => {
         <div class="sr-name">${p.Nome} ${rig} ${nw}</div>
         <div class="sr-meta">${p.Squadra} · ${p.RM} · Fm 25/26: ${fm}</div>
       </div>
-      <div class="sr-qta">${p.QtA} Cr</div>
+      <div class="sr-qta">${p.QtA} FM</div>
     `;
     el.addEventListener("click", () => { searchRes.classList.remove("open"); openModal(p); });
     searchRes.appendChild(el);
@@ -731,7 +734,7 @@ function openModal(p) {
   const rig  = p.Rigorista > 0 ? `#${p.Rigorista}` : "No";
 
   document.getElementById("modal-stats").innerHTML = `
-    Qt.A: <span>${p.QtA} Cr</span>  ·  FVM: <span>${fvm}</span>  ·  Rig: <span>${rig}</span><br>
+    Qt.A: <span>${p.QtA} FM</span>  ·  FVM: <span>${fvm}</span>  ·  Rig: <span>${rig}</span><br>
     Fm 25/26: <span>${fm}</span>  ·  Pv: <span>${pv}</span>  ·  Min%: <span>${minp}</span><br>
     Gol: <span>${gol}</span>  ·  Assist: <span>${ass}</span>  ·  Amm: <span>${amm}</span>
   `;
@@ -807,6 +810,33 @@ document.getElementById("pf-check").addEventListener("change", e => {
   pullForward = e.target.checked;
   save(); renderPitch();
 });
+
+// ════════════════════════════════════════════════════════════════
+// EXPORT CSV
+// ════════════════════════════════════════════════════════════════
+function exportCSV() {
+  if (!squad.length) { alert("Rosa vuota: niente da esportare."); return; }
+  const esc = v => {
+    const s = String(v ?? "");
+    return /[",\n;]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  };
+  const header = ["Nome","Squadra","RM","Ruolo_Scelto","Prezzo_FM","QtA"];
+  const rows = [...squad]
+    .sort((a,b) => ri(primaryRole(a.player)) - ri(primaryRole(b.player)))
+    .map(sp => [
+      sp.player.Nome, sp.player.Squadra, sp.player.RM,
+      sp.forced || "Auto", sp.price, sp.player.QtA
+    ].map(esc).join(","));
+  const csv  = [header.join(","), ...rows].join("\n");
+  const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href = url;
+  a.download = `squad_${formation}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+document.getElementById("export-btn").addEventListener("click", exportCSV);
 
 // ════════════════════════════════════════════════════════════════
 // PERSIST
