@@ -1,0 +1,15 @@
+# Ignora tutto...
+*
+
+# ...ma entra nelle cartelle per trovarci i file da tenere
+!*/
+
+# Tieni solo HTML e Python
+!*.html
+!*.py
+
+# Tieni il gitignore stesso
+!.gitignore
+
+# Escludi il virtualenv (pieno di .py di terze parti)
+.venv/

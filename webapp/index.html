@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fantacalcio Mantra 26/27</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', sans-serif; background: #111827; color: #e5e7eb; display: flex; height: 100vh; overflow: hidden; }
+
+/* ── LEFT PANEL ── */
+#left { width: 320px; min-width: 320px; background: #1f2937; display: flex; flex-direction: column; border-right: 1px solid #374151; }
+
+#left-header { background: #111827; padding: 12px 14px; border-bottom: 1px solid #374151; }
+#left-header h1 { font-size: 15px; color: #f59e0b; margin-bottom: 8px; letter-spacing: 0.5px; }
+#file-input { width: 100%; font-size: 11px; color: #9ca3af; cursor: pointer; }
+#file-status { font-size: 10px; color: #6b7280; margin-top: 4px; }
+
+#search-area { padding: 10px 12px; border-bottom: 1px solid #374151; position: relative; }
+#search-input {
+  width: 100%; padding: 8px 12px; border-radius: 8px;
+  border: 1px solid #374151; background: #111827;
+  color: #e5e7eb; font-size: 13px; outline: none;
+}
+#search-input:focus { border-color: #3b82f6; }
+#search-results {
+  position: absolute; left: 12px; right: 12px; top: 100%;
+  background: #1f2937; border: 1px solid #374151; border-radius: 8px;
+  max-height: 260px; overflow-y: auto; z-index: 50; display: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+#search-results.open { display: block; }
+.sr-item {
+  padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #374151;
+  display: flex; justify-content: space-between; align-items: center; gap: 8px;
+}
+.sr-item:last-child { border-bottom: none; }
+.sr-item:hover { background: #374151; }
+.sr-name { font-size: 12px; font-weight: 600; }
+.sr-meta { font-size: 10px; color: #9ca3af; margin-top: 1px; }
+.sr-qta { font-size: 13px; color: #f59e0b; font-weight: 700; white-space: nowrap; }
+.sr-new { font-size: 9px; background: #1d4ed8; color: #fff; padding: 1px 5px; border-radius: 10px; }
+.sr-rig { font-size: 9px; background: #92400e; color: #fcd34d; padding: 1px 5px; border-radius: 10px; }
+
+#budget-bar { background: #111827; padding: 8px 14px; display: flex; gap: 6px; border-bottom: 1px solid #374151; }
+.bud-item { flex: 1; text-align: center; background: #1f2937; border-radius: 8px; padding: 6px 4px; }
+.bud-val { font-size: 17px; font-weight: 700; }
+.bud-lbl { font-size: 9px; color: #6b7280; margin-top: 1px; }
+#budget-input { background: transparent; border: none; color: #34d399; font-size: 17px; font-weight: 700; width: 52px; text-align: center; }
+
+#roster-list { flex: 1; overflow-y: auto; padding: 8px; }
+.rp {
+  display: flex; align-items: center; gap: 6px; padding: 6px 8px;
+  background: #111827; border-radius: 8px; margin-bottom: 4px;
+  border: 1px solid #374151; transition: border-color 0.15s;
+}
+.rp:hover { border-color: #3b82f6; }
+.rp-badge {
+  font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 5px;
+  min-width: 28px; text-align: center; background: #374151; color: #60a5fa;
+}
+.rp-info { flex: 1; min-width: 0; }
+.rp-name { font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rp-sub { font-size: 9px; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rp-price { font-size: 13px; font-weight: 700; color: #f59e0b; white-space: nowrap; }
+.rp-del { color: #ef4444; cursor: pointer; font-size: 16px; padding: 0 2px; line-height: 1; flex-shrink: 0; }
+.rp-del:hover { color: #fca5a5; }
+.rp-rig { font-size: 8px; color: #fcd34d; }
+.rp-new { font-size: 8px; color: #60a5fa; }
+
+/* ── RIGHT PANEL ── */
+#right { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+#controls { background: #1f2937; padding: 8px 14px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid #374151; }
+#controls span { font-size: 11px; color: #6b7280; margin-right: 2px; }
+.fb {
+  padding: 5px 12px; border-radius: 20px; border: 1px solid #374151;
+  background: transparent; color: #9ca3af; cursor: pointer; font-size: 12px;
+  transition: all 0.15s;
+}
+.fb:hover { border-color: #3b82f6; color: #3b82f6; }
+.fb.active { background: #1d4ed8; border-color: #1d4ed8; color: #fff; font-weight: 600; }
+#pf-toggle { margin-left: auto; display: flex; align-items: center; gap: 5px; font-size: 12px; color: #9ca3af; cursor: pointer; user-select: none; }
+#pf-toggle input { accent-color: #1d4ed8; cursor: pointer; }
+
+#pitch-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 12px; background: #111827; }
+#pitch {
+  position: relative; border-radius: 10px; overflow: hidden;
+  background: linear-gradient(180deg, #16a34a 0%, #15803d 100%);
+  border: 3px solid #166534;
+  box-shadow: 0 0 40px rgba(0,0,0,0.5);
+}
+
+/* pitch lines */
+.pline { position: absolute; background: rgba(255,255,255,0.18); }
+.pcircle { position: absolute; border: 2px solid rgba(255,255,255,0.18); border-radius: 50%; }
+
+/* player slot */
+.pslot { position: absolute; transform: translate(-50%,-50%); display: flex; flex-direction: column; align-items: center; z-index: 10; }
+.pslot-role { font-size: 8px; color: rgba(255,255,255,0.5); margin-bottom: 1px; }
+.pslot-circle {
+  width: 48px; height: 48px; border-radius: 50%;
+  border: 2px dashed rgba(255,255,255,0.3);
+  background: rgba(0,0,0,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; color: rgba(255,255,255,0.35);
+  transition: all 0.2s;
+}
+.pslot.filled .pslot-circle {
+  background: #1e3a5f; border: 2px solid #60a5fa; color: #fff;
+  font-size: 9px; font-weight: 700; text-align: center; line-height: 1.2;
+}
+.pslot.filled.oop .pslot-circle { border-color: #f97316; background: #431407; }
+.pslot.filled.rig1 .pslot-circle { border-color: #fcd34d; }
+.pslot.filled.nuovo .pslot-circle { border-color: #818cf8; }
+.pslot-name { font-size: 9px; color: #fff; font-weight: 600; text-shadow: 1px 1px 3px #000; margin-top: 2px; max-width: 58px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pslot-price { font-size: 8px; color: #fcd34d; }
+.pslot-reserves { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 3px; }
+.pslot-res { font-size: 8px; color: #d1d5db; background: rgba(0,0,0,0.55); padding: 1px 6px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); white-space: nowrap; max-width: 66px; overflow: hidden; text-overflow: ellipsis; cursor: default; }
+
+/* ── BENCH ── */
+#bench { background: #1f2937; border-top: 1px solid #374151; padding: 6px 14px; display: flex; align-items: center; gap: 6px; overflow-x: auto; min-height: 48px; flex-shrink: 0; }
+#bench-lbl { font-size: 10px; color: #6b7280; white-space: nowrap; font-weight: 600; }
+.bp {
+  background: #111827; border: 1px solid #374151; border-radius: 6px;
+  padding: 3px 10px; font-size: 10px; white-space: nowrap; flex-shrink: 0;
+}
+.bp-role { color: #60a5fa; font-weight: 700; margin-right: 4px; }
+.bp-price { color: #f59e0b; }
+
+/* ── MODAL ── */
+#modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
+#modal.open { display: flex; }
+#modal-box { background: #1f2937; border-radius: 14px; padding: 24px; width: 300px; border: 1px solid #374151; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+#modal-title { font-size: 16px; font-weight: 700; color: #f59e0b; margin-bottom: 3px; }
+#modal-sub { font-size: 11px; color: #9ca3af; margin-bottom: 6px; }
+#modal-stats { font-size: 11px; color: #6b7280; margin-bottom: 16px; padding: 8px; background: #111827; border-radius: 8px; line-height: 1.8; }
+#modal-stats span { color: #e5e7eb; }
+#price-input {
+  width: 100%; padding: 12px; font-size: 22px; text-align: center;
+  border-radius: 8px; border: 2px solid #374151; background: #111827;
+  color: #f59e0b; font-weight: 700; margin-bottom: 12px; outline: none;
+}
+#price-input:focus { border-color: #f59e0b; }
+.mbts { display: flex; gap: 8px; }
+.mbts button { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 700; }
+#btn-ok { background: #1d4ed8; color: #fff; }
+#btn-ok:hover { background: #2563eb; }
+#btn-no { background: #374151; color: #9ca3af; }
+#btn-no:hover { background: #4b5563; }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #374151; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════ LEFT ════════════════════ -->
+<div id="left">
+  <div id="left-header">
+    <h1>⚽ FANTACALCIO MANTRA 26/27</h1>
+    <input type="file" id="file-input" accept=".csv">
+    <div id="file-status">Carica riassuntivo_asta_2627.csv</div>
+  </div>
+
+  <div id="search-area">
+    <input type="text" id="search-input" placeholder="🔍  Cerca giocatore..." autocomplete="off">
+    <div id="search-results"></div>
+  </div>
+
+  <div id="budget-bar">
+    <div class="bud-item">
+      <div class="bud-val"><input id="budget-input" type="number" value="250"> Cr</div>
+      <div class="bud-lbl">BUDGET</div>
+    </div>
+    <div class="bud-item">
+      <div class="bud-val" id="spent-val" style="color:#ef4444">0</div>
+      <div class="bud-lbl">SPESI</div>
+    </div>
+    <div class="bud-item">
+      <div class="bud-val" id="rem-val" style="color:#34d399">250</div>
+      <div class="bud-lbl">RIMASTI</div>
+    </div>
+    <div class="bud-item">
+      <div class="bud-val" id="cnt-val" style="color:#a78bfa">0</div>
+      <div class="bud-lbl">GIOCATORI</div>
+    </div>
+  </div>
+
+  <div id="roster-list"></div>
+</div>
+
+<!-- ════════════════════ RIGHT ════════════════════ -->
+<div id="right">
+  <div id="controls">
+    <span>MODULO:</span>
+    <button class="fb" data-f="3-4-3">3-4-3</button>
+    <button class="fb" data-f="3-4-1-2">3-4-1-2</button>
+    <button class="fb" data-f="3-4-2-1">3-4-2-1</button>
+    <button class="fb active" data-f="3-5-2">3-5-2</button>
+    <button class="fb" data-f="3-5-1-1">3-5-1-1</button>
+    <button class="fb" data-f="4-3-3">4-3-3</button>
+    <button class="fb" data-f="4-3-1-2">4-3-1-2</button>
+    <button class="fb" data-f="4-4-2">4-4-2</button>
+    <button class="fb" data-f="4-1-4-1">4-1-4-1</button>
+    <button class="fb" data-f="4-4-1-1">4-4-1-1</button>
+    <button class="fb" data-f="4-2-3-1">4-2-3-1</button>
+    <label id="pf-toggle" title="Se attivo, i polivalenti vengono tirati avanti per riempire slot offensivi vuoti. Se spento, ognuno resta nel ruolo più difensivo possibile.">
+      <input type="checkbox" id="pf-check"> Riempi buchi
+    </label>
+  </div>
+  <div id="pitch-wrap"><div id="pitch"></div></div>
+  <div id="bench"><span id="bench-lbl">PANCHINA</span></div>
+</div>
+
+<!-- ════════════════════ MODAL ════════════════════ -->
+<div id="modal">
+  <div id="modal-box">
+    <div id="modal-title"></div>
+    <div id="modal-sub"></div>
+    <div id="modal-stats"></div>
+    <input id="price-input" type="number" min="1" max="999" placeholder="Prezzo pagato (Cr)">
+    <div class="mbts">
+      <button id="btn-ok">✓ Aggiungi</button>
+      <button id="btn-no">✕ Annulla</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// DATA & STATE
+// ════════════════════════════════════════════════════════════════
+let players = [];
+let squad   = [];   // [{player, price}]
+let pending = null;
+let formation = "3-5-2";
+let budget  = 250;
+let pullForward = false;   // true = riempi slot offensivi vuoti tirando avanti i polivalenti
+
+const ROLE_ORDER = ["Por","Dc","B","Dd","Ds","E","M","C","W","T","A","Pc"];
+const ri = r => ROLE_ORDER.indexOf(r);
+
+function roles(p) { return (p.RM||"").split(";").map(s=>s.trim()).filter(Boolean); }
+function primaryRole(p) {
+  return roles(p).sort((a,b) => ri(a)-ri(b))[0] || "?";
+}
+
+// ════════════════════════════════════════════════════════════════
+// FORMATIONS — slots: {roles:[...], x%, y%}
+// roles = lista ruoli accettati dallo slot (tutti primari, nessuna penalità)
+// ════════════════════════════════════════════════════════════════
+const FORMS = {
+  "3-4-3": [
+    {roles:["Por"],        x:50,y:90},
+    {roles:["Dc"],         x:25,y:73},{roles:["Dc"],      x:50,y:73},{roles:["Dc","B"],   x:75,y:73},
+    {roles:["E"],          x:10,y:51},{roles:["M","C"],   x:33,y:51},{roles:["C"],        x:60,y:51},{roles:["E"],        x:90,y:51},
+    {roles:["W","A"],      x:18,y:18},{roles:["A","Pc"],  x:50,y:18},{roles:["W","A"],    x:82,y:18},
+  ],
+  "3-4-1-2": [
+    {roles:["Por"],        x:50,y:90},
+    {roles:["Dc"],         x:25,y:73},{roles:["Dc"],      x:50,y:73},{roles:["Dc","B"],   x:75,y:73},
+    {roles:["E"],          x:10,y:53},{roles:["M","C"],   x:33,y:53},{roles:["C"],        x:60,y:53},{roles:["E"],        x:90,y:53},
+    {roles:["T"],          x:50,y:34},
+    {roles:["A","Pc"],     x:33,y:14},{roles:["A","Pc"],  x:67,y:14},
+  ],
+  "3-4-2-1": [
+    {roles:["Por"],        x:50,y:90},
+    {roles:["Dc"],         x:25,y:73},{roles:["Dc"],      x:50,y:73},{roles:["Dc","B"],   x:75,y:73},
+    {roles:["E","W"],      x:10,y:53},{roles:["M"],       x:33,y:53},{roles:["M","C"],    x:60,y:53},{roles:["E"],        x:90,y:53},
+    {roles:["T"],          x:33,y:31},{roles:["T","A"],   x:67,y:31},
+    {roles:["A","Pc"],     x:50,y:12},
+  ],
+  "3-5-2": [
+    {roles:["Por"],        x:50,y:90},
+    {roles:["Dc"],         x:25,y:73},{roles:["Dc"],      x:50,y:73},{roles:["Dc","B"],   x:75,y:73},
+    {roles:["E","W"],      x:8, y:51},{roles:["M","C"],   x:28,y:51},{roles:["M"],        x:50,y:51},{roles:["C"],        x:72,y:51},{roles:["E"],        x:92,y:51},
+    {roles:["A","Pc"],     x:33,y:18},{roles:["A","Pc"],  x:67,y:18},
+  ],
+  "3-5-1-1": [
+    {roles:["Por"],        x:50,y:90},
+    {roles:["Dc"],         x:25,y:73},{roles:["Dc"],      x:50,y:73},{roles:["Dc","B"],   x:75,y:73},
+    {roles:["E","W"],      x:8, y:51},{roles:["M"],       x:28,y:51},{roles:["C"],        x:50,y:51},{roles:["M"],        x:72,y:51},{roles:["E","W"],    x:92,y:51},
+    {roles:["T","A"],      x:50,y:32},
+    {roles:["A","Pc"],     x:50,y:13},
+  ],
+  "4-3-3": [
+    {roles:["Por"],        x:50,y:90},
+    {roles:["Ds"],         x:14,y:73},{roles:["Dc"],      x:38,y:73},{roles:["Dc"],       x:62,y:73},{roles:["Dd"],       x:86,y:73},
+    {roles:["M","C"],      x:25,y:51},{roles:["M"],       x:50,y:51},{roles:["C"],        x:75,y:51},
+    {roles:["W","A"],      x:15,y:18},{roles:["A","Pc"],  x:50,y:18},{roles:["W","A"],    x:85,y:18},
+  ],
+  "4-3-1-2": [
+    {roles:["Por"],        x:50,y:90},
+    {roles:["Ds"],         x:14,y:73},{roles:["Dc"],      x:38,y:73},{roles:["Dc"],       x:62,y:73},{roles:["Dd"],       x:86,y:73},
+    {roles:["M","C"],      x:25,y:54},{roles:["M"],       x:50,y:54},{roles:["C"],        x:75,y:54},
+    {roles:["T"],          x:50,y:34},
+    {roles:["T","A","Pc"], x:33,y:13},{roles:["A","Pc"],  x:67,y:13},
+  ],
+  "4-4-2": [
+    {roles:["Por"],        x:50,y:90},
+    {roles:["Ds"],         x:14,y:73},{roles:["Dc"],      x:38,y:73},{roles:["Dc"],       x:62,y:73},{roles:["Dd"],       x:86,y:73},
+    {roles:["E","W"],      x:12,y:51},{roles:["M","C"],   x:38,y:51},{roles:["C"],        x:62,y:51},{roles:["E"],        x:88,y:51},
+    {roles:["A","Pc"],     x:33,y:18},{roles:["A","Pc"],  x:67,y:18},
+  ],
+  "4-1-4-1": [
+    {roles:["Por"],        x:50,y:90},
+    {roles:["Ds"],         x:14,y:75},{roles:["Dc"],      x:38,y:75},{roles:["Dc"],       x:62,y:75},{roles:["Dd"],       x:86,y:75},
+    {roles:["M"],          x:50,y:57},
+    {roles:["E","W"],      x:12,y:37},{roles:["C","T"],   x:38,y:37},{roles:["T"],        x:62,y:37},{roles:["W"],        x:88,y:37},
+    {roles:["A","Pc"],     x:50,y:14},
+  ],
+  "4-4-1-1": [
+    {roles:["Por"],        x:50,y:90},
+    {roles:["Ds"],         x:14,y:73},{roles:["Dc"],      x:38,y:73},{roles:["Dc"],       x:62,y:73},{roles:["Dd"],       x:86,y:73},
+    {roles:["E","W"],      x:12,y:52},{roles:["M"],       x:38,y:52},{roles:["C"],        x:62,y:52},{roles:["E","W"],    x:88,y:52},
+    {roles:["T","A"],      x:50,y:32},
+    {roles:["A","Pc"],     x:50,y:13},
+  ],
+  "4-2-3-1": [
+    {roles:["Por"],        x:50,y:90},
+    {roles:["Ds"],         x:14,y:75},{roles:["Dc"],      x:38,y:75},{roles:["Dc"],       x:62,y:75},{roles:["Dd"],       x:86,y:75},
+    {roles:["M"],          x:35,y:57},{roles:["M","C"],   x:65,y:57},
+    {roles:["W","T"],      x:14,y:36},{roles:["T"],       x:50,y:36},{roles:["W","A"],    x:86,y:36},
+    {roles:["A","Pc"],     x:50,y:14},
+  ],
+};
+
+// ════════════════════════════════════════════════════════════════
+// ASSIGNMENT
+// Titolari: match perfetto (score=0), più vincolato prima, QtA↓ tiebreaker.
+// Riserve per slot: chi non è titolare ma copre quel ruolo, QtA↓.
+// Chi non copre nessuno slot → "senza slot" in fondo.
+// ════════════════════════════════════════════════════════════════
+function qtaOf(sp) { return parseInt(sp.player.QtA) || 0; }
+
+function assign(squadList, f) {
+  const slots  = FORMS[f];
+  const result = new Array(slots.length).fill(null);
+  const used   = new Set();
+
+  // Ruoli-slot presenti nel modulo (unione di tutti gli slot).
+  const formRoles = new Set(slots.flatMap(s => s.roles));
+
+  // targetRole: il ruolo PIÙ DIFENSIVO del giocatore che il modulo prevede come slot.
+  // Es. B;Dd;E in un 3-difese (slot Dc,Dc,Dc/B): unico ruolo-slot coperto = B → target B.
+  // Il giocatore competerà SOLO per gli slot che accettano il suo target, mai per uno
+  // più offensivo. Così un secondo B;Dd;E finisce riserva di B, non titolare a E.
+  function targetRole(p) {
+    const pr = roles(p).sort((a,b) => ri(a) - ri(b));
+    for (const r of pr) if (formRoles.has(r)) return r;
+    return null; // nessuno slot naturale nel modulo
+  }
+  function eligible(sp, slot) {
+    const t = targetRole(sp.player);
+    return t !== null && slot.roles.includes(t);
+  }
+
+  // Waste: quanti ruoli PIÙ DIFENSIVI del giocatore lo slot NON usa.
+  // Un puro-ruolo (0 sprechi) batte un adattato. NON usa l'indice assoluto del ruolo:
+  // in slot A/Pc un Pc (Lautaro) e un A (Berardi) sono entrambi naturali (waste 0),
+  // quindi decide la QtA → titolare il più forte, non il "più difensivo".
+  function waste(sp, slot) {
+    const pr = roles(sp.player).sort((a,b) => ri(a) - ri(b));
+    for (let i = 0; i < pr.length; i++) if (slot.roles.includes(pr[i])) return i;
+    return 99;
+  }
+
+  // Candidati per uno slot (solo chi ha quel ruolo come target), ordinati:
+  // waste ASC (meno sprechi = più adatto), poi QtA DESC (il più forte titolare).
+  function candidates(si) {
+    return squadList
+      .filter(sp => !used.has(sp) && eligible(sp, slots[si]))
+      .sort((a,b) => {
+        const wa = waste(a, slots[si]);
+        const wb = waste(b, slots[si]);
+        if (wa !== wb) return wa - wb;
+        return qtaOf(b) - qtaOf(a);
+      });
+  }
+
+  // Most-constrained slot first.
+  // Tie-break: slot più difensivo prima (min roleIndex tra i ruoli accettati).
+  // Così Dc/B viene processato prima di E, anche con stesso numero di candidati.
+  function order() {
+    return slots.map((_,i)=>i)
+      .filter(i => result[i] === null)
+      .sort((a,b) => {
+        const ca = squadList.filter(sp => !used.has(sp) && eligible(sp, slots[a])).length;
+        const cb = squadList.filter(sp => !used.has(sp) && eligible(sp, slots[b])).length;
+        if (ca !== cb) return ca - cb;
+        // stesso numero di candidati → slot più difensivo prima
+        const da = Math.min(...slots[a].roles.map(r => ri(r)));
+        const db = Math.min(...slots[b].roles.map(r => ri(r)));
+        return da - db;
+      });
+  }
+
+  for (const si of order()) {
+    const best = candidates(si)[0];
+    if (best) { result[si] = best; used.add(best); }
+  }
+
+  // Pull-forward (opzionale): riempi gli slot rimasti vuoti tirando avanti i polivalenti,
+  // spostando se serve anche i titolari (matching bipartito, algoritmo di Kuhn).
+  // Es. 3-5-1-1 con Pulisic (T;A) titolare su T e Baturina (T) riserva: lo slot A/Pc è vuoto
+  // → Pulisic va avanti su A, Baturina scala titolare su T. Un buco riempito, nessuno nuovo.
+  // "natural" = il giocatore copre davvero quel ruolo (waste < 99), ignorando il target.
+  const natural = (sp, slot) => waste(sp, slot) < 99;
+  if (pullForward) {
+    // candidati per uno slot: meno fuori-ruolo (waste) e QtA più alta prima
+    const natCands = si => squadList
+      .filter(sp => natural(sp, slots[si]))
+      .sort((a,b) => {
+        const wa = waste(a, slots[si]);
+        const wb = waste(b, slots[si]);
+        if (wa !== wb) return wa - wb;
+        return qtaOf(b) - qtaOf(a);
+      });
+    const playerSlot = sp => result.findIndex(x => x === sp);
+    function augment(si, seen) {
+      for (const sp of natCands(si)) {
+        if (seen.has(sp)) continue;
+        seen.add(sp);
+        const cur = playerSlot(sp);              // slot che occupa ora (-1 = libero)
+        if (cur === -1 || augment(cur, seen)) {  // libero, o il suo slot si può riassegnare
+          result[si] = sp;
+          return true;
+        }
+      }
+      return false;
+    }
+    slots.forEach((_, si) => { if (result[si] === null) augment(si, new Set()); });
+    used.clear();
+    result.forEach(sp => { if (sp) used.add(sp); });
+  }
+
+  // Riserve: ogni non-titolare va in UN SOLO slot — il migliore per lui
+  // (waste minimo, poi slot più difensivo). Niente duplicati tra slot uguali/sovrapposti.
+  const reserves = slots.map(() => []);
+  squadList
+    .filter(sp => !used.has(sp) && targetRole(sp.player) !== null)
+    .forEach(sp => {
+      let bi = -1, bw = 99, br = 99;
+      slots.forEach((slot, i) => {
+        if (!eligible(sp, slot)) return;
+        const w  = waste(sp, slot);
+        const rr = Math.min(...slot.roles.map(r => ri(r)));
+        if (w < bw || (w === bw && rr < br)) { bw = w; br = rr; bi = i; }
+      });
+      if (bi >= 0) reserves[bi].push(sp);
+    });
+  reserves.forEach((list, i) =>
+    list.sort((a,b) => {
+      const wa = waste(a, slots[i]);
+      const wb = waste(b, slots[i]);
+      if (wa !== wb) return wa - wb;
+      return qtaOf(b) - qtaOf(a);
+    })
+  );
+
+  // Senza slot: chi non ha alcun ruolo-slot nel modulo
+  const noSlot = squadList.filter(sp =>
+    !used.has(sp) && targetRole(sp.player) === null
+  );
+
+  return { assigned: result, reserves, noSlot };
+}
+
+// ════════════════════════════════════════════════════════════════
+// PITCH RENDER
+// ════════════════════════════════════════════════════════════════
+function renderPitch() {
+  const wrap  = document.getElementById("pitch-wrap");
+  const pitch = document.getElementById("pitch");
+
+  const cw = wrap.clientWidth  - 24;
+  const ch = wrap.clientHeight - 24;
+  // maintain 2:3 aspect (w:h)
+  let pw, ph;
+  if (cw * 1.5 <= ch) { pw = cw; ph = cw * 1.5; }
+  else                 { ph = ch; pw = ch / 1.5; }
+  pitch.style.width  = pw + "px";
+  pitch.style.height = ph + "px";
+  pitch.innerHTML    = "";
+
+  // markings
+  const mkLine = (top,left,w,h) => {
+    const d = document.createElement("div");
+    d.className = "pline";
+    Object.assign(d.style,{top,left,width:w,height:h});
+    pitch.appendChild(d);
+  };
+  mkLine("50%","5%","90%","2px");         // halfway
+  mkLine("7%","20%","60%","2px");         // top box
+  mkLine("80%","20%","60%","2px");        // bottom box
+  mkLine("7%","20%","2px","14%");
+  mkLine("7%","80%","2px","14%");
+  mkLine("80%","20%","2px","14%");
+  mkLine("80%","80%","2px","14%");
+
+  const cc = document.createElement("div");
+  cc.className = "pcircle";
+  const cr = pw * 0.18;
+  Object.assign(cc.style,{
+    width:cr+"px",height:cr+"px",
+    top:"50%",left:"50%",transform:"translate(-50%,-50%)"
+  });
+  pitch.appendChild(cc);
+
+  const slots = FORMS[formation];
+  const {assigned, reserves, noSlot} = assign(squad, formation);
+
+  slots.forEach((slot, i) => {
+    const sp  = assigned[i];
+    const el  = document.createElement("div");
+    el.className = "pslot" + (sp?" filled":"");
+    if (sp) {
+      if (sp.player.Rigorista==1)           el.classList.add("rig1");
+      if (sp.player.Nuovo_Arrivo==="True")  el.classList.add("nuovo");
+    }
+    el.style.left = slot.x + "%";
+    el.style.top  = slot.y + "%";
+
+    const slotLabel = slot.roles.join("/");
+
+    const roleTag = document.createElement("div");
+    roleTag.className = "pslot-role";
+    roleTag.textContent = slotLabel;
+    el.appendChild(roleTag);
+
+    const circ = document.createElement("div");
+    circ.className = "pslot-circle";
+    if (sp) {
+      const nm = sp.player.Nome.split(/[\s\-\.]/)[0];
+      circ.textContent = nm.length > 7 ? nm.slice(0,6)+"." : nm;
+    } else {
+      circ.textContent = slotLabel;
+    }
+    el.appendChild(circ);
+
+    if (sp) {
+      const nameEl = document.createElement("div");
+      nameEl.className = "pslot-name";
+      nameEl.textContent = sp.player.Nome.split(" ")[0];
+      el.appendChild(nameEl);
+
+      const prEl = document.createElement("div");
+      prEl.className = "pslot-price";
+      prEl.textContent = sp.price + " Cr";
+      el.appendChild(prEl);
+    }
+
+    // riserve per questo slot
+    const res = reserves[i] || [];
+    if (res.length > 0) {
+      const resWrap = document.createElement("div");
+      resWrap.className = "pslot-reserves";
+      res.forEach(rsp => {
+        const r = document.createElement("div");
+        r.className = "pslot-res";
+        r.textContent = rsp.player.Nome.split(" ")[0] + " " + rsp.price + "Cr";
+        r.title = rsp.player.Nome + " · " + rsp.player.RM + " · Qt.A " + rsp.player.QtA;
+        resWrap.appendChild(r);
+      });
+      el.appendChild(resWrap);
+    }
+
+    pitch.appendChild(el);
+  });
+
+  // bench — solo chi non copre nessuno slot nel modulo
+  const benchEl = document.getElementById("bench");
+  benchEl.innerHTML = "<span id='bench-lbl'>SENZA SLOT</span>";
+  if (noSlot.length === 0) {
+    const empty = document.createElement("span");
+    empty.style.cssText = "font-size:11px;color:#4b5563";
+    empty.textContent = "—";
+    benchEl.appendChild(empty);
+  }
+  noSlot.forEach(sp => {
+    const el = document.createElement("div");
+    el.className = "bp";
+    el.innerHTML = `<span class="bp-role">${primaryRole(sp.player)}</span>${sp.player.Nome} <span class="bp-price">${sp.price}Cr</span>`;
+    benchEl.appendChild(el);
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// ROSTER LIST
+// ════════════════════════════════════════════════════════════════
+function renderRoster() {
+  const list = document.getElementById("roster-list");
+  list.innerHTML = "";
+
+  [...squad]
+    .sort((a,b) => ri(primaryRole(a.player)) - ri(primaryRole(b.player)))
+    .forEach(sp => {
+      const p   = sp.player;
+      const idx = squad.indexOf(sp);
+      const el  = document.createElement("div");
+      el.className = "rp";
+
+      const rigBadge  = p.Rigorista > 0 ? `<span class="rp-rig">R${p.Rigorista}</span> ` : "";
+      const newBadge  = p.Nuovo_Arrivo==="True" ? `<span class="rp-new">NEW</span> ` : "";
+      const fm        = p.Fm_2526 && !isNaN(p.Fm_2526) ? `Fm:${parseFloat(p.Fm_2526).toFixed(1)}` : "—";
+
+      el.innerHTML = `
+        <div class="rp-badge">${primaryRole(p)}</div>
+        <div class="rp-info">
+          <div class="rp-name">${rigBadge}${newBadge}${p.Nome}</div>
+          <div class="rp-sub">${p.Squadra} · ${p.RM} · ${fm}</div>
+        </div>
+        <div class="rp-price">${sp.price}Cr</div>
+        <div class="rp-del" data-idx="${idx}">×</div>
+      `;
+      el.querySelector(".rp-del").addEventListener("click", e => {
+        squad.splice(parseInt(e.target.dataset.idx), 1);
+        save(); renderRoster(); renderPitch();
+      });
+      list.appendChild(el);
+    });
+
+  // budget
+  const spent = squad.reduce((s,sp)=>s+sp.price,0);
+  const rem   = budget - spent;
+  document.getElementById("spent-val").textContent = spent;
+  document.getElementById("rem-val").textContent   = rem;
+  document.getElementById("rem-val").style.color   = rem < 0 ? "#ef4444" : "#34d399";
+  document.getElementById("cnt-val").textContent   = squad.length;
+}
+
+// ════════════════════════════════════════════════════════════════
+// SEARCH
+// ════════════════════════════════════════════════════════════════
+const searchIn  = document.getElementById("search-input");
+const searchRes = document.getElementById("search-results");
+
+searchIn.addEventListener("input", () => {
+  const q = searchIn.value.trim().toLowerCase();
+  searchRes.className = "";
+  searchRes.innerHTML = "";
+  if (q.length < 2 || !players.length) return;
+
+  const hits = players
+    .filter(p => p.Nome && p.Nome.toLowerCase().includes(q))
+    .slice(0, 14);
+
+  if (!hits.length) return;
+  searchRes.classList.add("open");
+
+  hits.forEach(p => {
+    const el  = document.createElement("div");
+    el.className = "sr-item";
+    const fm  = p.Fm_2526 && !isNaN(p.Fm_2526) ? parseFloat(p.Fm_2526).toFixed(1) : "—";
+    const rig = p.Rigorista > 0 ? `<span class="sr-rig">R${p.Rigorista}</span>` : "";
+    const nw  = p.Nuovo_Arrivo==="True" ? `<span class="sr-new">NEW</span>` : "";
+    el.innerHTML = `
+      <div>
+        <div class="sr-name">${p.Nome} ${rig} ${nw}</div>
+        <div class="sr-meta">${p.Squadra} · ${p.RM} · Fm 25/26: ${fm}</div>
+      </div>
+      <div class="sr-qta">${p.QtA} Cr</div>
+    `;
+    el.addEventListener("click", () => { searchRes.classList.remove("open"); openModal(p); });
+    searchRes.appendChild(el);
+  });
+});
+
+document.addEventListener("click", e => {
+  if (!e.target.closest("#search-area")) searchRes.classList.remove("open");
+});
+
+// ════════════════════════════════════════════════════════════════
+// MODAL
+// ════════════════════════════════════════════════════════════════
+function openModal(p) {
+  pending = p;
+  searchIn.value = "";
+  document.getElementById("modal-title").textContent = p.Nome;
+  document.getElementById("modal-sub").textContent   = `${p.Squadra} · ${p.RM}`;
+
+  const fm   = p.Fm_2526  && !isNaN(p.Fm_2526)  ? parseFloat(p.Fm_2526).toFixed(2)  : "—";
+  const pv   = p.Pv_2526  && !isNaN(p.Pv_2526)  ? p.Pv_2526  : "—";
+  const gol  = p.Gf_2526  && !isNaN(p.Gf_2526)  ? p.Gf_2526  : "—";
+  const ass  = p.Ass_2526 && !isNaN(p.Ass_2526)  ? p.Ass_2526 : "—";
+  const amm  = p.Amm_2526 && !isNaN(p.Amm_2526)  ? p.Amm_2526 : "—";
+  const minp = p["fb_Min%"] && !isNaN(p["fb_Min%"]) ? parseFloat(p["fb_Min%"]).toFixed(0)+"%" : "—";
+  const fvm  = p.FVM || "—";
+  const rig  = p.Rigorista > 0 ? `#${p.Rigorista}` : "No";
+
+  document.getElementById("modal-stats").innerHTML = `
+    Qt.A: <span>${p.QtA} Cr</span>  ·  FVM: <span>${fvm}</span>  ·  Rig: <span>${rig}</span><br>
+    Fm 25/26: <span>${fm}</span>  ·  Pv: <span>${pv}</span>  ·  Min%: <span>${minp}</span><br>
+    Gol: <span>${gol}</span>  ·  Assist: <span>${ass}</span>  ·  Amm: <span>${amm}</span>
+  `;
+
+  const pi = document.getElementById("price-input");
+  pi.value = p.QtA || "";
+  document.getElementById("modal").classList.add("open");
+  pi.focus(); pi.select();
+}
+
+function confirmAdd() {
+  const price = parseInt(document.getElementById("price-input").value);
+  if (!pending || !price || price < 1) return;
+  squad.push({ player: pending, price });
+  document.getElementById("modal").classList.remove("open");
+  pending = null;
+  save(); renderRoster(); renderPitch();
+}
+
+document.getElementById("btn-ok").addEventListener("click", confirmAdd);
+document.getElementById("btn-no").addEventListener("click", () => {
+  document.getElementById("modal").classList.remove("open");
+});
+document.getElementById("price-input").addEventListener("keydown", e => {
+  if (e.key === "Enter")  confirmAdd();
+  if (e.key === "Escape") document.getElementById("modal").classList.remove("open");
+});
+
+// ════════════════════════════════════════════════════════════════
+// FILE LOAD
+// ════════════════════════════════════════════════════════════════
+document.getElementById("file-input").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  Papa.parse(file, {
+    header: true, skipEmptyLines: true,
+    complete: r => {
+      players = r.data.filter(p => p.Nome && p.Nome.trim());
+      players.forEach(p => {
+        p.QtA       = parseInt(p.QtA)       || 1;
+        p.FVM       = parseInt(p.FVM)       || 0;
+        p.Rigorista = parseInt(p.Rigorista) || 0;
+      });
+      document.getElementById("file-status").textContent =
+        `✓ ${players.length} giocatori caricati`;
+      document.getElementById("file-status").style.color = "#34d399";
+    },
+    error: () => {
+      document.getElementById("file-status").textContent = "⚠ Errore nel file";
+      document.getElementById("file-status").style.color = "#ef4444";
+    }
+  });
+});
+
+// ════════════════════════════════════════════════════════════════
+// FORMATION BUTTONS
+// ════════════════════════════════════════════════════════════════
+document.querySelectorAll(".fb").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".fb").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    formation = btn.dataset.f;
+    save(); renderPitch();
+  });
+});
+
+document.getElementById("budget-input").addEventListener("change", e => {
+  budget = parseInt(e.target.value) || 250;
+  save(); renderRoster();
+});
+
+document.getElementById("pf-check").addEventListener("change", e => {
+  pullForward = e.target.checked;
+  save(); renderPitch();
+});
+
+// ════════════════════════════════════════════════════════════════
+// PERSIST
+// ════════════════════════════════════════════════════════════════
+function save() {
+  localStorage.setItem("fc_squad",     JSON.stringify(squad));
+  localStorage.setItem("fc_formation", formation);
+  localStorage.setItem("fc_budget",    budget);
+  localStorage.setItem("fc_pullfwd",   pullForward ? "1" : "0");
+}
+
+function load() {
+  try { squad = JSON.parse(localStorage.getItem("fc_squad")) || []; } catch(e) { squad=[]; }
+  const f = localStorage.getItem("fc_formation");
+  if (f && FORMS[f]) {
+    formation = f;
+    document.querySelectorAll(".fb").forEach(b => b.classList.toggle("active", b.dataset.f===f));
+  }
+  const b = localStorage.getItem("fc_budget");
+  if (b) { budget = parseInt(b); document.getElementById("budget-input").value = budget; }
+  pullForward = localStorage.getItem("fc_pullfwd") === "1";
+  document.getElementById("pf-check").checked = pullForward;
+}
+
+window.addEventListener("resize", renderPitch);
+
+load(); renderRoster(); renderPitch();
+</script>
+</body>
+</html>
