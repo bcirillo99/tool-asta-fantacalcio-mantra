@@ -79,7 +79,28 @@ d'occhio quanti giocatori non riesci a schierare col modulo scelto.
 
 ## Note
 
-- Tutto gira **in locale nel browser**. Nessun dato viene inviato online.
+- Tutto gira **in locale nel browser**. Nessun dato viene inviato online,
+  niente account, niente tracciamento: la tua rosa resta sul tuo dispositivo.
 - Ruoli Mantra: Por, Dc, B, Dd, Ds, E, M, C, W, T, A, Pc.
 - Moduli disponibili: 3-4-3, 3-4-1-2, 3-4-2-1, 3-5-2, 3-5-1-1, 4-3-3,
   4-3-1-2, 4-4-2, 4-1-4-1, 4-4-1-1, 4-2-3-1.
+
+## Sviluppi futuri
+
+Se avete idee, contribuite con una *issue*.
+
+## Note legali e dati
+
+- **DraftMantra è un progetto indipendente e non ufficiale.** Non è affiliato,
+  associato o approvato da *Fantacalcio®* / *fantacalcio.it* (Quadronica S.r.l.)
+  né dalla Lega Serie A. I marchi citati appartengono ai rispettivi proprietari.
+- I dati dei calciatori (lista, quotazioni, ruoli) **sono di proprietà di
+  fantacalcio.it**. Il tool **non li ridistribuisce**: sei tu a scaricarli dal
+  loro sito e a caricarli localmente. Nessun file di dati è incluso in questo repo.
+- Progetto pensato per **uso personale e non commerciale**, senza scopo di lucro.
+- Codice rilasciato sotto licenza **MIT** (vedi [`LICENSE`](LICENSE)).
+
+## Crediti
+
+- Parsing CSV: [PapaParse](https://www.papaparse.com/) (licenza MIT), incluso in
+  locale per il funzionamento offline.
