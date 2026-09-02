@@ -34,11 +34,14 @@ squadra, quotazione e fantavalore — tutto ciò che serve.
 
 1. Apri `webapp/index.html` nel browser (doppio click, nessuna installazione).
 2. Clicca **Carica file** e seleziona `Lista-FantaAsta-Fantacalcio.csv`.
-3. Imposta il **budget** (default 500 FM).
+3. Imposta il **budget**: nella barra crediti clicca sul numero sotto
+   **"Budget"** (quello con la riga tratteggiata) e digita i tuoi crediti
+   totali. Default 500 FM.
 4. Durante l'asta: **cerca** il giocatore, inserisci il **prezzo pagato**,
-   **Aggiungi**. Budget e conteggi si aggiornano da soli.
+   **Aggiungi**. Crediti rimasti, spesi, giocatori di movimento e portieri si
+   aggiornano da soli, con barra che mostra quanto budget hai già bruciato.
 5. Scegli il **modulo** in alto a destra: la rosa si dispone in automatico
-   sul campo, mettendo i migliori in campo (in base alla QT.A) e il resto in panchina.
+   sul campo, mettendo i migliori in campo (in base alla Qt.A) e il resto in panchina.
 6. A fine asta, **Esporta squadra CSV** per salvare la rosa.
 
 ## Come funziona lo schieramento
@@ -50,11 +53,15 @@ non quello da T.
 Per ogni multiruolo puoi comunque **forzare a mano il ruolo** con cui vuoi
 schierarlo, tramite il menu a tendina accanto al giocatore nell'elenco.
 
-### Opzione "Riempi buchi"
+Chi non entra in nessuno slot del modulo finisce nella fascia **"Senza slot"**
+in fondo al campo, evidenziato in rosso e con un contatore: così vedi a colpo
+d'occhio quanti giocatori non riesci a schierare col modulo scelto.
+
+### Toggle "Copri slot vuoti"
 
 - **Spento** (default): ogni polivalente resta nel ruolo più difensivo.
-- **Acceso**: i polivalenti vengono spinti in avanti per coprire slot
-  offensivi vuoti.
+- **Acceso**: i polivalenti vengono spinti in avanti per coprire gli slot
+  offensivi rimasti vuoti.
 
 ## Note
 
