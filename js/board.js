@@ -35,10 +35,21 @@ function boardN() {
   return (v && v > 0) ? v : 20;
 }
 
+// Layout: "rows" = sezioni verticali (scroll ↕) · "cols" = 12 colonne (scroll ↔)
+let boardLayoutMode = localStorage.getItem("fc_boardLayout") || "rows";
+
+function playersForRole(role, N) {
+  return players
+    .filter(p => primaryRole(p) === role)
+    .sort((a,b) => (b.QtaM || b.QtA) - (a.QtaM || a.QtA))
+    .slice(0, N);
+}
+
 // ── render griglia ──────────────────────────────────────────────
 function renderBoard() {
   const grid = document.getElementById("board-grid");
   if (!grid) return;
+  grid.className = boardLayoutMode;   // "rows" | "cols"
   grid.innerHTML = "";
 
   if (!players.length) {
@@ -47,32 +58,48 @@ function renderBoard() {
   }
 
   const N = boardN();
-
   BOARD_ORDER.forEach(role => {
-    const list = players
-      .filter(p => primaryRole(p) === role)
-      .sort((a,b) => (b.QtaM || b.QtA) - (a.QtaM || a.QtA))
-      .slice(0, N);
+    const list = playersForRole(role, N);
     if (!list.length) return;
-
-    const col = document.createElement("div");
-    col.className = "bcol";
-    col.style.setProperty("--rc", roleColor(role));
-
-    const head = document.createElement("div");
-    head.className = "bcol-head";
-    head.innerHTML = `<span class="bcol-name">${BOARD_LABELS[role]}</span>` +
-                     `<span class="bcol-role">${role}</span>` +
-                     `<span class="bcol-count">${list.length}</span>`;
-    col.appendChild(head);
-
-    const body = document.createElement("div");
-    body.className = "bcol-body";
-    list.forEach(p => body.appendChild(makeRow(p)));
-    col.appendChild(body);
-
-    grid.appendChild(col);
+    grid.appendChild(boardLayoutMode === "cols" ? buildCol(role, list)
+                                                 : buildSection(role, list));
   });
+}
+
+// vista 12 colonne (scroll orizzontale)
+function buildCol(role, list) {
+  const col = document.createElement("div");
+  col.className = "bcol";
+  col.style.setProperty("--rc", roleColor(role));
+  col.innerHTML =
+    `<div class="bcol-head">` +
+      `<span class="bcol-name">${BOARD_LABELS[role]}</span>` +
+      `<span class="bcol-role">${role}</span>` +
+      `<span class="bcol-count">${list.length}</span>` +
+    `</div>`;
+  const body = document.createElement("div");
+  body.className = "bcol-body";
+  list.forEach(p => body.appendChild(makeRow(p)));
+  col.appendChild(body);
+  return col;
+}
+
+// vista verticale: sezioni impilate, header sticky, griglia multi-colonna
+function buildSection(role, list) {
+  const sec = document.createElement("div");
+  sec.className = "bsec";
+  sec.style.setProperty("--rc", roleColor(role));
+  sec.innerHTML =
+    `<div class="bsec-head">` +
+      `<span class="bsec-name">${BOARD_LABELS[role].toUpperCase()}</span>` +
+      `<span class="bsec-role">${role}</span>` +
+      `<span class="bsec-count">${list.length}</span>` +
+    `</div>`;
+  const g = document.createElement("div");
+  g.className = "bsec-grid";
+  list.forEach(p => g.appendChild(makeRow(p)));
+  sec.appendChild(g);
+  return sec;
 }
 
 function makeRow(p) {
@@ -151,6 +178,18 @@ document.getElementById("board-n").addEventListener("input", () => {
   localStorage.setItem("fc_boardN", boardN());
   renderBoard();
 });
+document.querySelectorAll("#board-layout button").forEach(b => {
+  b.addEventListener("click", () => {
+    boardLayoutMode = b.dataset.l;
+    localStorage.setItem("fc_boardLayout", boardLayoutMode);
+    syncLayoutButtons();
+    renderBoard();
+  });
+});
+function syncLayoutButtons() {
+  document.querySelectorAll("#board-layout button").forEach(b =>
+    b.classList.toggle("active", b.dataset.l === boardLayoutMode));
+}
 document.addEventListener("click", e => { if (!e.target.closest("#board-pop")) hidePop(); });
 document.addEventListener("keydown", e => {
   if (e.key === "Escape" && boardEl.classList.contains("open")) {
@@ -163,3 +202,4 @@ document.addEventListener("keydown", e => {
 loadTaken();
 const savedN = parseInt(localStorage.getItem("fc_boardN"));
 if (savedN && savedN > 0) document.getElementById("board-n").value = savedN;
+syncLayoutButtons();
