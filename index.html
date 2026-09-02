@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fantacalcio Mantra 26/27</title>
+<title>DraftMantra — Asta Fantacalcio Mantra 26/27</title>
 <script src="js/papaparse.min.js"></script>
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -12,10 +12,14 @@
 <!-- ════════════════════ LEFT ════════════════════ -->
 <div id="left">
   <div id="left-header">
-    <h1>Fantacalcio Mantra 26/27</h1>
+    <h1>Draft<span class="mk">Mantra</span></h1>
+    <label id="file-btn" for="file-input">📂 Carica lista giocatori</label>
     <input type="file" id="file-input" accept=".csv">
     <div id="file-status">Carica Lista-FantaAsta-Fantacalcio.csv</div>
-    <button id="export-btn">Esporta squadra CSV</button>
+    <div id="header-actions">
+      <button id="export-btn">Esporta squadra CSV</button>
+      <button id="reset-btn" title="Svuota la rosa e riparti da zero">↺ Reset asta</button>
+    </div>
   </div>
 
   <div id="search-area">

@@ -1,4 +1,4 @@
-# ⚽ Fantacalcio Mantra 26/27 — Gestore Asta
+# 🏟️ DraftMantra — Gestore Asta Fantacalcio Mantra
 
 Tool web per **gestire l'asta del Fantacalcio (modalità Mantra)**.
 

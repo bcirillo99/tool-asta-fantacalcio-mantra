@@ -13,6 +13,10 @@ function renderPitch() {
   else                 { ph = ch; pw = ch / 1.5; }
   pitch.style.width  = pw + "px";
   pitch.style.height = ph + "px";
+  // Scala cerchi e testi dei giocatori con la dimensione del campo:
+  // a campi grandi (schermi ampi) i nomi non restano piccoli. Base ~380px = 1x.
+  const scale = Math.max(1, Math.min(1.3, pw / 380));
+  pitch.style.setProperty("--scale", scale.toFixed(3));
   pitch.innerHTML    = "";
 
   // markings

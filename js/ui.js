@@ -129,6 +129,20 @@ function exportCSV() {
 document.getElementById("export-btn").addEventListener("click", exportCSV);
 
 // ════════════════════════════════════════════════════════════════
+// RESET ASTA — svuota la rosa e riparte da zero (conferma richiesta)
+// ════════════════════════════════════════════════════════════════
+document.getElementById("reset-btn").addEventListener("click", () => {
+  if (!squad.length) { alert("La rosa è già vuota."); return; }
+  const ok = confirm(
+    `Reset asta: verranno rimossi tutti i ${squad.length} giocatori acquistati ` +
+    `e i crediti torneranno a ${budget} FM.\n\nQuesta azione non è annullabile. Procedere?`
+  );
+  if (!ok) return;
+  squad = [];
+  save(); renderRoster(); renderPitch();
+});
+
+// ════════════════════════════════════════════════════════════════
 // PERSIST
 // ════════════════════════════════════════════════════════════════
 function save() {

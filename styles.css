@@ -38,16 +38,23 @@ body {
 body.resizing { cursor: col-resize; user-select: none; }
 
 #left-header { padding: 14px 16px 12px; border-bottom: 1px solid var(--border); }
-#left-header h1 { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 10px; letter-spacing: -0.01em; display: flex; align-items: center; gap: 7px; }
-#left-header h1::before { content: "⚽"; font-size: 16px; }
-#file-input { width: 100%; font-size: 11px; color: var(--text-dim); cursor: pointer; }
-#file-input::file-selector-button {
-  margin-right: 8px; padding: 5px 11px; border-radius: var(--r-sm);
-  border: 1px solid var(--border-hi); background: var(--surface-2);
-  color: var(--text); font-size: 11px; font-weight: 600; cursor: pointer;
+#left-header h1 {
+  font-family: "Avenir Next", "Futura", "Trebuchet MS", var(--font, system-ui), sans-serif;
+  font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 12px;
+  letter-spacing: -0.02em; display: flex; align-items: center; gap: 8px; line-height: 1;
+}
+#left-header h1::before { content: "🏟️"; font-size: 22px; }
+#left-header h1 .mk { color: var(--accent); }
+/* input file nativo nascosto: apre comunque il dialog cliccando la label */
+#file-input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; pointer-events: none; }
+#file-btn {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  width: 100%; padding: 9px; border-radius: var(--r);
+  border: 1px dashed var(--border-hi); background: var(--surface-2);
+  color: var(--text); font-size: 12px; font-weight: 600; cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
 }
-#file-input::file-selector-button:hover { background: var(--surface-3); border-color: var(--accent); }
+#file-btn:hover { background: var(--surface-3); border-color: var(--accent); }
 #file-status { font-size: 10.5px; color: var(--text-faint); margin-top: 6px; }
 
 #search-area { padding: 12px; border-bottom: 1px solid var(--border); position: relative; }
@@ -116,13 +123,16 @@ body.resizing { cursor: col-resize; user-select: none; }
 .rp-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rp-sub { font-size: 9.5px; color: var(--text-faint); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rp-price { font-size: 13px; font-weight: 700; color: var(--gold); white-space: nowrap; }
-.rp-price::after { content: "\00a0FM"; font-size: 9px; font-weight: 600; color: var(--text-faint); }
-#export-btn {
-  margin-top: 10px; width: 100%; background: var(--surface-2); color: var(--text);
+.rp-price::after { content: " FM"; white-space: pre; font-size: 9px; font-weight: 600; color: var(--text-faint); }
+#header-actions { display: flex; gap: 8px; margin-top: 10px; }
+#export-btn, #reset-btn {
+  flex: 1; background: var(--surface-2); color: var(--text);
   border: 1px solid var(--border-hi); border-radius: var(--r); padding: 9px; font-size: 12px;
-  font-weight: 600; cursor: pointer; transition: background 0.15s, border-color 0.15s;
+  font-weight: 600; cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 #export-btn:hover { background: var(--surface-3); border-color: var(--accent); }
+#reset-btn { flex: 0 0 auto; color: var(--text-dim); }
+#reset-btn:hover { background: oklch(0.66 0.20 25 / 0.14); border-color: var(--neg); color: var(--neg); }
 .rp-role { flex-shrink: 0; background: var(--bg); color: var(--text-dim); border: 1px solid var(--border); border-radius: var(--r-sm); font-size: 10px; padding: 3px 4px; cursor: pointer; outline: none; }
 .rp-role:hover { border-color: var(--accent); color: var(--text); }
 .rp-del { color: var(--text-faint); cursor: pointer; font-size: 17px; padding: 0 3px; line-height: 1; flex-shrink: 0; transition: color 0.12s; }
@@ -154,6 +164,7 @@ body.resizing { cursor: col-resize; user-select: none; }
 
 #pitch-wrap { flex: 1; min-height: 0; min-width: 0; display: flex; align-items: center; justify-content: center; padding: 12px; background: var(--bg); }
 #pitch {
+  --scale: 1;   /* impostata da renderPitch in base alla dimensione del campo */
   position: relative; border-radius: 10px; overflow: visible;
   background: linear-gradient(180deg, #16a34a 0%, #15803d 100%);
   border: 3px solid #166534;
@@ -166,30 +177,30 @@ body.resizing { cursor: col-resize; user-select: none; }
 
 /* player slot */
 .pslot { position: absolute; transform: translate(-50%,-50%); display: flex; flex-direction: column; align-items: center; z-index: 10; }
-.pslot-role { font-size: 8px; color: rgba(255,255,255,0.5); margin-bottom: 1px; }
+.pslot-role { font-size: calc(8px * var(--scale)); color: rgba(255,255,255,0.5); margin-bottom: 1px; }
 .pslot-circle {
-  width: 48px; height: 48px; border-radius: 50%;
+  width: calc(48px * var(--scale)); height: calc(48px * var(--scale)); border-radius: 50%;
   border: 2px dashed rgba(255,255,255,0.3);
   background: rgba(0,0,0,0.25);
   display: flex; align-items: center; justify-content: center;
-  font-size: 9px; color: rgba(255,255,255,0.35);
-  transition: all 0.2s;
+  font-size: calc(9px * var(--scale)); color: rgba(255,255,255,0.35);
+  transition: background 0.2s, border-color 0.2s;
 }
 .pslot.filled .pslot-circle {
   background: #1e3a5f; border: 2px solid #60a5fa; color: #fff;
-  font-size: 9px; font-weight: 700; text-align: center; line-height: 1.2;
+  font-size: calc(9px * var(--scale)); font-weight: 700; text-align: center; line-height: 1.2;
 }
 .pslot.filled.oop .pslot-circle { border-color: #f97316; background: #431407; }
 .pslot.filled.rig1 .pslot-circle { border-color: #fcd34d; }
 .pslot.filled.nuovo .pslot-circle { border-color: #818cf8; }
-.pslot-name { font-size: 9px; color: #fff; font-weight: 600; text-shadow: 1px 1px 3px #000; margin-top: 2px; max-width: 58px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pslot-price { font-size: 8px; color: #fcd34d; }
-.pslot-reserves { display: flex; flex-direction: column; align-items: center; gap: 3px; margin-top: 4px; }
+.pslot-name { font-size: calc(9.5px * var(--scale)); color: #fff; font-weight: 600; text-shadow: 1px 1px 3px #000; margin-top: calc(2px * var(--scale)); max-width: calc(64px * var(--scale)); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pslot-price { font-size: calc(8px * var(--scale)); color: #fcd34d; }
+.pslot-reserves { display: flex; flex-direction: column; align-items: center; gap: calc(3px * var(--scale)); margin-top: calc(4px * var(--scale)); }
 .pslot-res {
-  display: flex; align-items: baseline; gap: 5px;
-  font-size: 8.5px; color: #e5e7eb; background: rgba(0,0,0,0.6);
-  padding: 2px 7px; border-radius: 9px; border: 1px solid rgba(255,255,255,0.15);
-  max-width: 132px; line-height: 1.25; cursor: default;
+  display: flex; align-items: baseline; gap: calc(5px * var(--scale));
+  font-size: calc(8.5px * var(--scale)); color: #e5e7eb; background: rgba(0,0,0,0.6);
+  padding: calc(2px * var(--scale)) calc(7px * var(--scale)); border-radius: 9px; border: 1px solid rgba(255,255,255,0.15);
+  max-width: calc(132px * var(--scale)); line-height: 1.25; cursor: default;
 }
 .res-name  { font-weight: 600; white-space: nowrap; }
 .res-role  { color: #9ca3af; font-weight: 700; white-space: nowrap; }
