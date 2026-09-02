@@ -85,6 +85,7 @@ document.getElementById("file-input").addEventListener("change", e => {
         fs.textContent = "⚠ Nessun giocatore riconosciuto nel file";
         fs.style.color = "var(--neg)";
       }
+      if (typeof renderBoard === "function") renderBoard();
     },
     error: () => {
       document.getElementById("file-status").textContent = "⚠ Errore nel file";

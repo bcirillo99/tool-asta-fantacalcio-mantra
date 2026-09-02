@@ -83,6 +83,7 @@ function confirmAdd() {
   document.getElementById("modal").classList.remove("open");
   pending = null;
   save(); renderRoster(); renderPitch();
+  if (typeof renderBoard === "function") renderBoard();
 }
 
 document.getElementById("btn-ok").addEventListener("click", confirmAdd);
@@ -156,6 +157,7 @@ document.getElementById("reset-btn").addEventListener("click", () => {
   if (!ok) return;
   squad = [];
   save(); renderRoster(); renderPitch();
+  if (typeof renderBoard === "function") renderBoard();
 });
 
 // ════════════════════════════════════════════════════════════════

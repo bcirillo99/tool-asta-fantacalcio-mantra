@@ -62,6 +62,7 @@
 <!-- ════════════════════ RIGHT ════════════════════ -->
 <div id="right">
   <div id="controls">
+    <button id="board-open" title="Tabellone: tutti i giocatori per ruolo, da spuntare durante l'asta">📋 Tabellone</button>
     <span>MODULO:</span>
     <button class="fb" data-f="3-4-3">3-4-3</button>
     <button class="fb" data-f="3-4-1-2">3-4-1-2</button>
@@ -99,6 +100,24 @@
 </div>
 
 
+<!-- ════════════════════ TABELLONE (vista a schermo intero) ════════════════════ -->
+<div id="board">
+  <div id="board-bar">
+    <button id="board-close">← Campo</button>
+    <div id="board-title">Tabellone <span class="mk">— giocatori per ruolo</span></div>
+    <label id="board-n-lbl" title="Quanti giocatori mostrare per ogni ruolo">
+      Per ruolo:
+      <input id="board-n" type="number" min="1" max="300" value="20">
+    </label>
+    <div id="board-legend">
+      <span class="bl-item"><i class="bl-dot avail"></i>disponibile</span>
+      <span class="bl-item"><i class="bl-dot mine"></i>mio</span>
+      <span class="bl-item"><i class="bl-dot out"></i>preso</span>
+    </div>
+  </div>
+  <div id="board-grid"></div>
+</div>
+
 <!-- Moduli JS: script classici, caricati in ordine di dipendenza.
      Niente ES modules così l'app funziona anche aprendo il file col doppio-click. -->
 <script src="js/data.js"></script>
@@ -106,5 +125,6 @@
 <script src="js/assign.js"></script>
 <script src="js/render.js"></script>
 <script src="js/ui.js"></script>
+<script src="js/board.js"></script>
 </body>
 </html>
