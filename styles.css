@@ -177,7 +177,7 @@ body.resizing { cursor: col-resize; user-select: none; }
 
 /* player slot */
 .pslot { position: absolute; transform: translate(-50%,-50%); display: flex; flex-direction: column; align-items: center; z-index: 10; }
-.pslot-role { font-size: calc(8px * var(--scale)); color: rgba(255,255,255,0.5); margin-bottom: 1px; }
+.pslot-role { font-size: calc(8px * var(--scale)); font-weight: 700; color: rgba(255,255,255,0.92); text-shadow: 0 1px 2px rgba(0,0,0,0.7); margin-bottom: 2px; letter-spacing: 0.02em; }
 .pslot-circle {
   width: calc(48px * var(--scale)); height: calc(48px * var(--scale)); border-radius: 50%;
   border: 2px dashed rgba(255,255,255,0.3);
@@ -194,7 +194,6 @@ body.resizing { cursor: col-resize; user-select: none; }
 .pslot.filled.rig1 .pslot-circle { border-color: #fcd34d; }
 .pslot.filled.nuovo .pslot-circle { border-color: #818cf8; }
 .pslot-name { font-size: calc(9.5px * var(--scale)); color: #fff; font-weight: 600; text-shadow: 1px 1px 3px #000; margin-top: calc(2px * var(--scale)); max-width: calc(64px * var(--scale)); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pslot-price { font-size: calc(8px * var(--scale)); color: #fcd34d; }
 .pslot-reserves { display: flex; flex-direction: column; align-items: center; gap: calc(3px * var(--scale)); margin-top: calc(4px * var(--scale)); }
 .pslot-res {
   display: flex; align-items: baseline; gap: calc(5px * var(--scale));
@@ -203,8 +202,7 @@ body.resizing { cursor: col-resize; user-select: none; }
   max-width: calc(132px * var(--scale)); line-height: 1.25; cursor: default;
 }
 .res-name  { font-weight: 600; white-space: nowrap; }
-.res-role  { color: #9ca3af; font-weight: 700; white-space: nowrap; }
-.res-price { color: #fcd34d; margin-left: auto; white-space: nowrap; }
+.res-role  { color: #9ca3af; font-weight: 700; white-space: nowrap; margin-left: auto; }
 
 /* ── BENCH (senza slot) ── */
 #bench { background: var(--surface); border-top: 1px solid var(--border); padding: 8px 14px; display: flex; align-items: center; gap: 7px; overflow-x: auto; min-height: 48px; flex-shrink: 0; }

@@ -89,11 +89,7 @@ function renderPitch() {
       nameEl.className = "pslot-name";
       nameEl.textContent = sp.player.Nome.split(" ")[0];
       el.appendChild(nameEl);
-
-      const prEl = document.createElement("div");
-      prEl.className = "pslot-price";
-      prEl.textContent = sp.price + " FM";
-      el.appendChild(prEl);
+      // prezzo del titolare non mostrato in campo (salva spazio): resta nell'elenco rosa
     }
 
     // riserve per questo slot
@@ -105,9 +101,8 @@ function renderPitch() {
         const r = document.createElement("div");
         r.className = "pslot-res";
         r.innerHTML = `<span class="res-name">${rsp.player.Nome}</span>` +
-                      `<span class="res-role">${roles(rsp.player).join("/")}</span>` +
-                      `<span class="res-price">${rsp.price} FM</span>`;
-        r.title = rsp.player.Nome + " · " + rsp.player.RM + " · Qt.A " + rsp.player.QtA;
+                      `<span class="res-role">${roles(rsp.player).join("/")}</span>`;
+        r.title = rsp.player.Nome + " · " + rsp.player.RM + " · " + rsp.price + " FM";
         resWrap.appendChild(r);
       });
       el.appendChild(resWrap);

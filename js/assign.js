@@ -111,17 +111,24 @@ function assign(squadList, f) {
   }
 
   // Riserve: ogni non-titolare va in UN SOLO slot — il migliore per lui
-  // (waste minimo, poi slot più difensivo). Niente duplicati tra slot uguali/sovrapposti.
+  // (waste minimo, poi slot più difensivo). A parità di idoneità le riserve si
+  // BILANCIANO tra slot uguali: va in quello con meno riserve già assegnate
+  // (es. con 2 slot Dc e 6 riserve → 3 e 3, non 6 e 1).
   const reserves = slots.map(() => []);
   squadList
     .filter(sp => !used.has(sp) && targetRole(sp) !== null)
     .forEach(sp => {
-      let bi = -1, bw = 99, br = 99;
+      let bi = -1, bw = 99, br = 99, bl = Infinity;
       slots.forEach((slot, i) => {
         if (!eligible(sp, slot)) return;
         const w  = waste(sp, slot);
         const rr = Math.min(...slot.roles.map(r => ri(r)));
-        if (w < bw || (w === bw && rr < br)) { bw = w; br = rr; bi = i; }
+        const ld = reserves[i].length;                 // carico attuale dello slot
+        if (w < bw ||
+            (w === bw && rr < br) ||
+            (w === bw && rr === br && ld < bl)) {
+          bw = w; br = rr; bl = ld; bi = i;
+        }
       });
       if (bi >= 0) reserves[bi].push(sp);
     });
