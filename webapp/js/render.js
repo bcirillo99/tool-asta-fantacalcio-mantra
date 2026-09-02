@@ -96,7 +96,9 @@ function renderPitch() {
       res.forEach(rsp => {
         const r = document.createElement("div");
         r.className = "pslot-res";
-        r.textContent = rsp.player.Nome.split(" ")[0] + " " + rsp.price + "FM";
+        r.innerHTML = `<span class="res-name">${rsp.player.Nome}</span>` +
+                      `<span class="res-role">${roles(rsp.player).join("/")}</span>` +
+                      `<span class="res-price">${rsp.price} FM</span>`;
         r.title = rsp.player.Nome + " · " + rsp.player.RM + " · Qt.A " + rsp.player.QtA;
         resWrap.appendChild(r);
       });
@@ -120,7 +122,7 @@ function renderPitch() {
   noSlot.forEach(sp => {
     const el = document.createElement("div");
     el.className = "bp nofit";
-    el.innerHTML = `<span class="bp-role">${primaryRole(sp.player)}</span>${sp.player.Nome} <span class="bp-price">${sp.price}FM</span>`;
+    el.innerHTML = `<span class="bp-role">${primaryRole(sp.player)}</span>${sp.player.Nome} <span class="bp-price">${sp.price} FM</span>`;
     benchEl.appendChild(el);
   });
 }
@@ -160,7 +162,7 @@ function renderRoster() {
           <div class="rp-sub">${p.Squadra} · ${p.RM} · FVM ${p.FvmM || "—"}</div>
         </div>
         ${roleSel}
-        <div class="rp-price">${sp.price}FM</div>
+        <div class="rp-price">${sp.price}</div>
         <div class="rp-del" data-idx="${idx}">×</div>
       `;
       el.querySelector(".rp-del").addEventListener("click", e => {

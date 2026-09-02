@@ -154,7 +154,7 @@ body.resizing { cursor: col-resize; user-select: none; }
 
 #pitch-wrap { flex: 1; min-height: 0; min-width: 0; display: flex; align-items: center; justify-content: center; padding: 12px; background: var(--bg); }
 #pitch {
-  position: relative; border-radius: 10px; overflow: hidden;
+  position: relative; border-radius: 10px; overflow: visible;
   background: linear-gradient(180deg, #16a34a 0%, #15803d 100%);
   border: 3px solid #166534;
   box-shadow: 0 0 40px rgba(0,0,0,0.5);
@@ -184,8 +184,16 @@ body.resizing { cursor: col-resize; user-select: none; }
 .pslot.filled.nuovo .pslot-circle { border-color: #818cf8; }
 .pslot-name { font-size: 9px; color: #fff; font-weight: 600; text-shadow: 1px 1px 3px #000; margin-top: 2px; max-width: 58px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pslot-price { font-size: 8px; color: #fcd34d; }
-.pslot-reserves { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 3px; }
-.pslot-res { font-size: 8px; color: #d1d5db; background: rgba(0,0,0,0.55); padding: 1px 6px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); white-space: nowrap; max-width: 66px; overflow: hidden; text-overflow: ellipsis; cursor: default; }
+.pslot-reserves { display: flex; flex-direction: column; align-items: center; gap: 3px; margin-top: 4px; }
+.pslot-res {
+  display: flex; align-items: baseline; gap: 5px;
+  font-size: 8.5px; color: #e5e7eb; background: rgba(0,0,0,0.6);
+  padding: 2px 7px; border-radius: 9px; border: 1px solid rgba(255,255,255,0.15);
+  max-width: 132px; line-height: 1.25; cursor: default;
+}
+.res-name  { font-weight: 600; white-space: nowrap; }
+.res-role  { color: #9ca3af; font-weight: 700; white-space: nowrap; }
+.res-price { color: #fcd34d; margin-left: auto; white-space: nowrap; }
 
 /* ── BENCH (senza slot) ── */
 #bench { background: var(--surface); border-top: 1px solid var(--border); padding: 8px 14px; display: flex; align-items: center; gap: 7px; overflow-x: auto; min-height: 48px; flex-shrink: 0; }
