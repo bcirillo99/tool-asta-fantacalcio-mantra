@@ -26,9 +26,9 @@ Link diretto: <https://www.fantacalcio.it/app-fantaasta>
 Il tool legge il CSV della Lista così com'è: contiene nome, ruoli Mantra,
 squadra, quotazione e fantavalore — tutto ciò che serve.
 
-> Il file `riassuntivo_asta_2627.csv` presente nel repo è una versione
-> arricchita (con statistiche stagione precedente e rigoristi) generata
-> dagli script Python. Opzionale: se lo carichi, vedrai anche quelle info.
+> In alternativa il tool accetta anche un CSV **arricchito** (con intestazioni
+> tipo `Nome`, `RM`, `QtA_M`, `FVM_M`, statistiche, rigoristi): se lo carichi,
+> vengono usate anche quelle informazioni extra.
 
 ## Come si usa
 
