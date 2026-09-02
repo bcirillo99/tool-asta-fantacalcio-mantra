@@ -4,8 +4,10 @@
 # ...ma entra nelle cartelle per trovarci i file da tenere
 !*/
 
-# Tieni solo HTML e Python
+# Tieni codice sorgente webapp e Python
 !*.html
+!*.css
+!*.js
 !*.py
 !*.md
 
