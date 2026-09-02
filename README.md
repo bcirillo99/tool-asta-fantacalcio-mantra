@@ -8,6 +8,8 @@ Serve solo a
 **inserire i giocatori che compri durante l'asta** e vedere **in tempo
 reale come schierarli** nei vari moduli.
 
+![DraftMantra — schermata iniziale](assets/homepage.png)
+
 ## A cosa serve
 
 Durante l'asta tieni traccia di:
@@ -76,6 +78,17 @@ d'occhio quanti giocatori non riesci a schierare col modulo scelto.
 - **Spento** (default): ogni polivalente resta nel ruolo più difensivo.
 - **Acceso**: i polivalenti vengono spinti in avanti per coprire gli slot
   offensivi rimasti vuoti.
+
+<table>
+  <tr>
+    <td><img src="assets/rosa.png" alt="Toggle spento"></td>
+    <td><img src="assets/rosa_riempicampi.png" alt="Toggle acceso"></td>
+  </tr>
+  <tr>
+    <td align="center"><em>Spento: ognuno nel ruolo più difensivo</em></td>
+    <td align="center"><em>Acceso: polivalenti spinti in avanti</em></td>
+  </tr>
+</table>
 
 ## Note
 

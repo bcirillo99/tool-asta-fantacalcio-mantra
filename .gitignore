@@ -10,6 +10,15 @@
 !*.js
 !*.md
 
+# Tieni immagini (screenshot/asset per il README)
+!*.png
+!*.jpg
+!*.jpeg
+!*.gif
+!*.svg
+!*.webp
+!*.ico
+
 # Tieni il gitignore stesso
 !.gitignore
 
