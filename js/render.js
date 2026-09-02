@@ -13,10 +13,6 @@ function renderPitch() {
   else                 { ph = ch; pw = ch / 1.5; }
   pitch.style.width  = pw + "px";
   pitch.style.height = ph + "px";
-  // Scala cerchi e testi dei giocatori con la dimensione del campo:
-  // a campi grandi (schermi ampi) i nomi non restano piccoli. Base ~380px = 1x.
-  const scale = Math.max(1, Math.min(1.3, pw / 380));
-  pitch.style.setProperty("--scale", scale.toFixed(3));
   pitch.innerHTML    = "";
 
   // markings
@@ -45,6 +41,14 @@ function renderPitch() {
 
   const slots = FORMS[formation];
   const {assigned, reserves, noSlot} = assign(squad, formation);
+
+  // --scale: parte dalla dimensione del campo (schermi grandi = testi più leggibili),
+  // poi RIMPICCIOLISCE se un reparto è affollato di riserve, così le pile non si
+  // sovrappongono agli slot vicini. Ogni riserva oltre la 2ª toglie ~13%, minimo 0.6x.
+  const sizeScale = Math.max(1, Math.min(1.3, pw / 380));
+  const maxRes    = reserves.reduce((m, r) => Math.max(m, r.length), 0);
+  const crowd     = maxRes <= 3 ? 1 : Math.max(0.75, 1 - (maxRes - 3) * 0.08);
+  pitch.style.setProperty("--scale", (sizeScale * crowd).toFixed(3));
 
   slots.forEach((slot, i) => {
     const sp  = assigned[i];

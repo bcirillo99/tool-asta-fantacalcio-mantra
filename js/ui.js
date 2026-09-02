@@ -60,9 +60,25 @@ function openModal(p) {
   pi.focus(); pi.select();
 }
 
+// Identità giocatore: stesso oggetto, oppure stesso nome+squadra+ruolo
+// (robusto anche se la lista è stata ricaricata e gli oggetti sono diversi).
+function samePlayer(a, b) {
+  return a === b || (a.Nome === b.Nome && a.Squadra === b.Squadra && a.RM === b.RM);
+}
+
 function confirmAdd() {
   const price = parseInt(document.getElementById("price-input").value);
   if (!pending || !price || price < 1) return;
+  if (squad.some(sp => samePlayer(sp.player, pending))) {
+    alert(`${pending.Nome} è già in rosa: non puoi aggiungerlo due volte.`);
+    return;
+  }
+  const rem = budget - squad.reduce((s, sp) => s + sp.price, 0);
+  if (price > rem) {
+    alert(`Hai sforato il budget: rimasti ${rem} FM ma il prezzo è ${price} FM.\n` +
+          `Rimuovi un giocatore o alza il budget prima di procedere.`);
+    return;
+  }
   squad.push({ player: pending, price });
   document.getElementById("modal").classList.remove("open");
   pending = null;
