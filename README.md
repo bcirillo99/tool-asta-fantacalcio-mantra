@@ -2,7 +2,9 @@
 
 Tool web per **gestire l'asta del Fantacalcio (modalità Mantra)**.
 
-Nessuna AI, nessun consiglio automatico, nessun server. Serve solo a
+Nessuna AI, nessun consiglio automatico, **l'asta si fa da soli!!!!!!**.
+
+Serve solo a
 **inserire i giocatori che compri durante l'asta** e vedere **in tempo
 reale come schierarli** nei vari moduli.
 
@@ -30,9 +32,21 @@ squadra, quotazione e fantavalore — tutto ciò che serve.
 > tipo `Nome`, `RM`, `QtA_M`, `FVM_M`, statistiche, rigoristi): se lo carichi,
 > vengono usate anche quelle informazioni extra.
 
+## Come aprirla
+
+Due modi, scegli tu:
+
+- **Online (niente da scaricare):** apri il link di GitHub Pages e parte nel
+  browser → <https://bcirillo99.github.io/tool-asta-fantacalcio-mantra/>
+- **Offline (asta in cantina senza WiFi):** scarica il progetto (bottone verde
+  **Code → Download ZIP**), estrai, e fai doppio click su `index.html`.
+  Funziona tutto in locale, PapaParse incluso: **zero internet**.
+
+In entrambi i casi nessuna installazione, nessun `npm`, nessun server.
+
 ## Come si usa
 
-1. Apri `webapp/index.html` nel browser (doppio click, nessuna installazione).
+1. Apri l'app (via link Pages o `index.html`, vedi sopra).
 2. Clicca **Carica file** e seleziona `Lista-FantaAsta-Fantacalcio.csv`.
 3. Imposta il **budget**: nella barra crediti clicca sul numero sotto
    **"Budget"** (quello con la riga tratteggiata) e digita i tuoi crediti
