@@ -56,6 +56,7 @@ In entrambi i casi nessuna installazione, nessun `npm`, nessun server.
 4. Durante l'asta: **cerca** il giocatore, inserisci il **prezzo pagato**,
    **Aggiungi**. Crediti rimasti, spesi, giocatori di movimento e portieri si
    aggiornano da soli, con barra che mostra quanto budget hai già bruciato.
+   Sbagliato il prezzo? **Clicca sul prezzo** nell'elenco per correggerlo al volo.
 5. Scegli il **modulo** in alto a destra: la rosa si dispone in automatico
    sul campo, mettendo i migliori in campo (in base alla Qt.A) e il resto in panchina.
 6. A fine asta, **Esporta squadra CSV** per salvare la rosa.

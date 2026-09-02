@@ -165,12 +165,15 @@ function renderRoster() {
           <div class="rp-sub">${p.Squadra} · ${p.RM} · FVM ${p.FvmM || "—"}</div>
         </div>
         ${roleSel}
-        <div class="rp-price">${sp.price}</div>
+        <div class="rp-price" title="Clicca per modificare il prezzo">${sp.price}</div>
         <div class="rp-del" data-idx="${idx}">×</div>
       `;
       el.querySelector(".rp-del").addEventListener("click", e => {
         squad.splice(parseInt(e.target.dataset.idx), 1);
         save(); renderRoster(); renderPitch();
+      });
+      el.querySelector(".rp-price").addEventListener("click", function () {
+        editPrice(sp, this);
       });
       const sel = el.querySelector(".rp-role");
       if (sel) sel.addEventListener("change", e => {
@@ -196,5 +199,37 @@ function renderRoster() {
   const pct  = budget > 0 ? Math.min(100, (spent / budget) * 100) : 0;
   fill.style.width = pct + "%";
   fill.classList.toggle("over", over);
+}
+
+// Modifica prezzo di un giocatore già in rosa: il div prezzo diventa un input.
+// Invio/blur salva (con controllo budget), Escape annulla.
+function editPrice(sp, priceEl) {
+  const input = document.createElement("input");
+  input.type = "number"; input.min = "1"; input.value = sp.price;
+  input.className = "rp-price-input";
+  priceEl.replaceWith(input);
+  input.focus(); input.select();
+
+  let done = false;
+  const cancel = () => { if (!done) { done = true; renderRoster(); renderPitch(); } };
+  const commit = () => {
+    if (done) return;
+    const v = parseInt(input.value);
+    if (v && v >= 1) {
+      const others = squad.reduce((s, x) => s + (x === sp ? 0 : x.price), 0);
+      if (others + v > budget) {
+        alert(`Con ${v} FM sfori il budget (${budget} FM). Prezzo non modificato.`);
+      } else {
+        sp.price = v;
+      }
+    }
+    done = true;
+    save(); renderRoster(); renderPitch();
+  };
+  input.addEventListener("blur", commit);
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter")  { e.preventDefault(); input.blur(); }
+    if (e.key === "Escape") cancel();
+  });
 }
 

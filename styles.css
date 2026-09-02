@@ -122,8 +122,14 @@ body.resizing { cursor: col-resize; user-select: none; }
 .rp-info { flex: 1; min-width: 0; }
 .rp-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rp-sub { font-size: 9.5px; color: var(--text-faint); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.rp-price { font-size: 13px; font-weight: 700; color: var(--gold); white-space: nowrap; }
+.rp-price { font-size: 13px; font-weight: 700; color: var(--gold); white-space: nowrap; cursor: pointer; border-bottom: 1px dashed transparent; }
+.rp-price:hover { border-bottom-color: var(--border-hi); }
 .rp-price::after { content: " FM"; white-space: pre; font-size: 9px; font-weight: 600; color: var(--text-faint); }
+.rp-price-input {
+  width: 52px; font-size: 13px; font-weight: 700; color: var(--gold);
+  background: var(--bg); border: 1px solid var(--accent); border-radius: var(--r-sm);
+  text-align: right; padding: 2px 4px; outline: none;
+}
 #header-actions { display: flex; gap: 8px; margin-top: 10px; }
 #export-btn, #reset-btn {
   flex: 1; background: var(--surface-2); color: var(--text);
