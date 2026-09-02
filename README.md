@@ -99,6 +99,12 @@ d'occhio quanti giocatori non riesci a schierare col modulo scelto.
 - Moduli disponibili: 3-4-3, 3-4-1-2, 3-4-2-1, 3-5-2, 3-5-1-1, 4-3-3,
   4-3-1-2, 4-4-2, 4-1-4-1, 4-4-1-1, 4-2-3-1.
 
+## Segnalare un bug
+
+Il progetto è giovane e può contenere qualche bug. Se ne trovi uno,
+**apri una [issue](../../issues)** descrivendo cosa stavi facendo e cosa è
+successo (uno screenshot aiuta). Grazie per l'aiuto a migliorarlo!
+
 ## Sviluppi futuri
 
 Se avete idee, contribuite con una *issue*.
