@@ -84,6 +84,7 @@ body.resizing { cursor: col-resize; user-select: none; }
 .sr-meta { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
 .sr-qta { font-size: 13px; color: var(--gold); font-weight: 700; white-space: nowrap; }
 .sr-new { font-size: 9px; font-weight: 700; background: oklch(0.66 0.15 250 / 0.18); color: var(--accent); padding: 1px 6px; border-radius: 10px; }
+.sr-stats { font-size: 9.5px; color: var(--text-faint); margin-top: 3px; }
 .sr-rig { font-size: 9px; font-weight: 700; background: oklch(0.80 0.14 82 / 0.16); color: var(--gold); padding: 1px 6px; border-radius: 10px; }
 
 #budget-bar { background: var(--bg); padding: 13px 16px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }

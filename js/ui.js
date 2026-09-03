@@ -22,10 +22,21 @@ searchIn.addEventListener("input", () => {
     el.className = "sr-item";
     const rig = p.Rigorista > 0 ? `<span class="sr-rig">R${p.Rigorista}</span>` : "";
     const nw  = p.Nuovo_Arrivo==="True" ? `<span class="sr-new">NEW</span>` : "";
+    const fm  = p.Fm_2526  ? `FM <b>${parseFloat(p.Fm_2526).toFixed(2)}</b>` : "";
+    const mv  = p.Mv_2526  ? ` · Mv ${parseFloat(p.Mv_2526).toFixed(2)}` : "";
+    const pv  = p.Pv_2526  ? ` · Pv ${p.Pv_2526}` : "";
+    const xg  = p.xG       ? ` · xG ${parseFloat(p.xG).toFixed(1)}` : "";
+    const xgd = p.xG_diff  ? (() => {
+      const d = parseFloat(p.xG_diff), s = d > 0 ? "+" : "";
+      const c = d < -1 ? "var(--pos)" : d > 2 ? "var(--neg)" : "var(--text-faint)";
+      return ` · <span style="color:${c}">${s}${d.toFixed(1)}</span>`;
+    })() : "";
+    const stats = [fm+mv+pv, xg+xgd].filter(Boolean).join(" · ");
     el.innerHTML = `
       <div>
         <div class="sr-name">${p.Nome} ${rig} ${nw}</div>
         <div class="sr-meta">${p.Squadra} · ${p.RM} · FVM ${p.FvmM || "—"}</div>
+        ${stats ? `<div class="sr-stats">${stats}</div>` : ""}
       </div>
       <div class="sr-qta">${p.QtaM || p.QtA} FM</div>
     `;
