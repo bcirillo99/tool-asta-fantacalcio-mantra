@@ -271,7 +271,12 @@ body.resizing { cursor: col-resize; user-select: none; }
 #board-close:hover { background: var(--surface-3); border-color: var(--accent); }
 #board-title { font-size: 17px; font-weight: 800; letter-spacing: -0.01em; }
 #board-title .mk { color: var(--text-faint); font-weight: 600; font-size: 13px; }
-#board-n-lbl { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.04em; }
+#board-n-lbl, #board-sort-lbl { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.04em; }
+#board-sort {
+  background: var(--bg); border: 1px solid var(--border); border-radius: var(--r-sm);
+  color: var(--text); font-size: 12px; font-weight: 600; padding: 5px 8px; outline: none; cursor: pointer;
+}
+#board-sort:focus { border-color: var(--accent); }
 #board-n {
   width: 58px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--r-sm);
   color: var(--text); font-size: 14px; font-weight: 700; text-align: center; padding: 5px 4px; outline: none;
@@ -311,7 +316,8 @@ body.resizing { cursor: col-resize; user-select: none; }
 .bsec-name { font-size: 13px; font-weight: 800; letter-spacing: 0.02em; }
 .bsec-role { font-size: 9px; font-weight: 700; color: var(--rc); background: oklch(0 0 0 / 0.22); padding: 1px 6px; border-radius: 8px; }
 .bsec-count { margin-left: auto; font-size: 11px; font-weight: 700; color: var(--text-faint); }
-.bsec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 4px; }
+.bsec-grid { columns: 3 200px; column-gap: 6px; }
+.bsec-grid .brow { break-inside: avoid; margin-bottom: 4px; }
 
 .bcol {
   --rc: #9ca3af;
@@ -338,6 +344,7 @@ body.resizing { cursor: col-resize; user-select: none; }
 .brow-name { flex: 1; min-width: 0; font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .brow-roles { font-size: 8.5px; font-weight: 700; color: var(--rc, var(--text-faint)); background: oklch(0 0 0 / 0.22); padding: 1px 5px; border-radius: 7px; white-space: nowrap; flex-shrink: 0; letter-spacing: 0.02em; }
 .brow-qta { font-size: 12px; font-weight: 700; color: var(--gold); white-space: nowrap; }
+.brow-sub { font-size: 8px; font-weight: 500; color: var(--text-faint); margin-left: 2px; vertical-align: baseline; }
 .brow-rig { font-size: 8px; font-weight: 800; color: var(--gold); margin-left: 4px; }
 .brow-new { font-size: 8px; font-weight: 800; color: var(--accent); margin-left: 3px; }
 .brow-tag { font-size: 8px; font-weight: 800; padding: 1px 5px; border-radius: 8px; letter-spacing: 0.04em; }

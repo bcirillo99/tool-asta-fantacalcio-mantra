@@ -38,10 +38,36 @@ function boardN() {
 // Layout: "rows" = sezioni verticali (scroll ↕) · "cols" = 12 colonne (scroll ↔)
 let boardLayoutMode = localStorage.getItem("fc_boardLayout") || "rows";
 
+// stat disponibili per l'ordinamento
+const BOARD_STATS = {
+  qta:        { label: "Qt.A",       get: p => p.QtaM || p.QtA || 0,           asc: false },
+  fm:         { label: "FM",         get: p => parseFloat(p.Fm_2526)  || 0,     asc: false },
+  mv:         { label: "Mv",         get: p => parseFloat(p.Mv_2526)  || 0,     asc: false },
+  pv:         { label: "Pv",         get: p => parseFloat(p.Pv_2526)  || 0,     asc: false },
+  xg:         { label: "xG",         get: p => parseFloat(p.xG)       || 0,     asc: false },
+  xa:         { label: "xA",         get: p => parseFloat(p.xA)       || 0,     asc: false },
+  gol:        { label: "Gol",        get: p => parseFloat(p.Gf_2526)  || 0,     asc: false },
+  efficienza: { label: "Efficienza", get: p => parseFloat(p.Efficienza)|| 0,    asc: false },
+  xgdiff:    { label: "xG_diff",    get: p => parseFloat(p.xG_diff)  ?? Infinity, asc: true },
+};
+
+function boardSortKey() { return localStorage.getItem("fc_boardSort") || "qta"; }
+
 function playersForRole(role, N) {
+  const key  = boardSortKey();
+  const stat = BOARD_STATS[key] || BOARD_STATS.qta;
   return players
     .filter(p => primaryRole(p) === role)
-    .sort((a,b) => (b.QtaM || b.QtA) - (a.QtaM || a.QtA))
+    .sort((a, b) => {
+      const va = stat.get(a), vb = stat.get(b);
+      // chi non ha il dato va in fondo sempre
+      const aNaN = va === 0 || va === Infinity || isNaN(va);
+      const bNaN = vb === 0 || vb === Infinity || isNaN(vb);
+      if (aNaN && bNaN) return 0;
+      if (aNaN) return 1;
+      if (bNaN) return -1;
+      return stat.asc ? va - vb : vb - va;
+    })
     .slice(0, N);
 }
 
@@ -108,19 +134,30 @@ function makeRow(p) {
   const row = document.createElement("div");
   row.className = "brow" + (mine ? " mine" : "") + (taken ? " taken" : "");
 
-  const qta = p.QtaM || p.QtA;
   const rig = p.Rigorista > 0 ? `<span class="brow-rig">R${p.Rigorista}</span>` : "";
   const nw  = p.Nuovo_Arrivo === "True" ? `<span class="brow-new">N</span>` : "";
   const tag = mine  ? `<span class="brow-tag mine">MIO</span>`
             : taken ? `<span class="brow-tag out">PRESO</span>` : "";
 
-  // multiruolo: mostra tutti i ruoli coperti accanto al nome (ordine difensivo→offensivo)
   const rl   = roles(p).sort((a,b) => ri(a) - ri(b));
   const mult = rl.length > 1 ? `<span class="brow-roles">${rl.join("/")}</span>` : "";
 
+  // valore mostrato = stat selezionata (con Qt.A in subscript se diversa)
+  const skey = boardSortKey();
+  const stat = BOARD_STATS[skey] || BOARD_STATS.qta;
+  const rawV = stat.get(p);
+  const qta  = p.QtaM || p.QtA;
+  let valHtml;
+  if (skey === "qta" || !rawV || rawV === Infinity || isNaN(rawV)) {
+    valHtml = `<span class="brow-qta">${qta}</span>`;
+  } else {
+    const disp = Number.isInteger(rawV) ? rawV : rawV.toFixed(2);
+    valHtml = `<span class="brow-qta">${disp}<sub class="brow-sub">${qta}</sub></span>`;
+  }
+
   row.innerHTML =
     `<span class="brow-name">${p.Nome}${rig}${nw}</span>${mult}` +
-    `<span class="brow-qta">${qta}</span>${tag}`;
+    `${valHtml}${tag}`;
   row.title = `${p.Nome} · ${p.Squadra} · ${p.RM} · FVM ${p.FvmM || "—"}`;
   row.addEventListener("click", e => openBoardMenu(p, e));
   return row;
@@ -178,6 +215,10 @@ document.getElementById("board-n").addEventListener("input", () => {
   localStorage.setItem("fc_boardN", boardN());
   renderBoard();
 });
+document.getElementById("board-sort").addEventListener("change", e => {
+  localStorage.setItem("fc_boardSort", e.target.value);
+  renderBoard();
+});
 document.querySelectorAll("#board-layout button").forEach(b => {
   b.addEventListener("click", () => {
     boardLayoutMode = b.dataset.l;
@@ -202,4 +243,6 @@ document.addEventListener("keydown", e => {
 loadTaken();
 const savedN = parseInt(localStorage.getItem("fc_boardN"));
 if (savedN && savedN > 0) document.getElementById("board-n").value = savedN;
+const savedSort = localStorage.getItem("fc_boardSort");
+if (savedSort) document.getElementById("board-sort").value = savedSort;
 syncLayoutButtons();

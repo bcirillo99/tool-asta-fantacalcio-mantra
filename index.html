@@ -109,6 +109,20 @@
       Per ruolo:
       <input id="board-n" type="number" min="1" max="300" value="20">
     </label>
+    <label id="board-sort-lbl" title="Ordina i giocatori per questa statistica">
+      Ordina:
+      <select id="board-sort">
+        <option value="qta">Qt.A</option>
+        <option value="fm">FM</option>
+        <option value="mv">Mv (D-Factor)</option>
+        <option value="pv">Pv (presenze)</option>
+        <option value="xg">xG</option>
+        <option value="xa">xA</option>
+        <option value="gol">Gol</option>
+        <option value="efficienza">Efficienza</option>
+        <option value="xgdiff">xG_diff ↑ (buy)</option>
+      </select>
+    </label>
     <div id="board-layout" title="Layout tabellone">
       <button data-l="rows">▤ Verticale</button>
       <button data-l="cols">▥ Colonne</button>
