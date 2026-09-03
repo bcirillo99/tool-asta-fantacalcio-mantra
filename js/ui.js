@@ -49,9 +49,23 @@ function openModal(p) {
 
   const qtaM = p.QtaM || p.QtA;
 
+  const fmv   = p.Fm_2526  ? `FM <span>${parseFloat(p.Fm_2526).toFixed(2)}</span>` : "";
+  const mv    = p.Mv_2526  ? ` · Mv <span>${parseFloat(p.Mv_2526).toFixed(2)}</span>` : "";
+  const pv    = p.Pv_2526  ? ` · Pv <span>${p.Pv_2526}</span>` : "";
+  const xg    = p.xG       ? `xG <span>${parseFloat(p.xG).toFixed(1)}</span>` : "";
+  const xa    = p.xA       ? ` · xA <span>${parseFloat(p.xA).toFixed(1)}</span>` : "";
+  const diff  = p.xG_diff  ? (() => {
+    const d = parseFloat(p.xG_diff);
+    const sign = d > 0 ? "+" : "";
+    const col  = d < -1 ? "var(--pos)" : d > 2 ? "var(--neg)" : "inherit";
+    return ` · xG_diff <span style="color:${col}">${sign}${d.toFixed(1)}</span>`;
+  })() : "";
+  const eff   = p.Efficienza ? ` · Eff <span>${parseFloat(p.Efficienza).toFixed(2)}</span>` : "";
+  const gs    = p.Gs_2526  ? ` · GS <span>${p.Gs_2526}</span>` : "";
+
   document.getElementById("modal-stats").innerHTML = `
-    Qt.A: <span>${qtaM} FM</span>  ·  Qt.I: <span>${p.QtiM || "—"}</span><br>
-    FVM: <span>${p.FvmM || "—"}</span>  ·  Ruolo: <span>${p.RM}</span>
+    Qt.A: <span>${qtaM} FM</span>  ·  FVM: <span>${p.FvmM || "—"}</span>  ·  Ruolo: <span>${p.RM}</span><br>
+    ${[fmv+mv+pv+eff, xg+xa+diff+gs].filter(Boolean).join("<br>")}
   `;
 
   const pi = document.getElementById("price-input");

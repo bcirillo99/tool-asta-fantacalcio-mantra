@@ -52,17 +52,35 @@ function fromHeader(rows) {
   const head = rows[0].map(h => (h||"").trim());
   const idx  = {}; head.forEach((h,i) => idx[h] = i);
   const get  = (r,k) => idx[k] != null ? r[idx[k]] : "";
+  const num  = (r,k) => parseFloat(get(r,k)) || 0;
   return rows.slice(1)
     .filter(r => (get(r,"Nome")||"").trim())
     .map(r => ({
       Nome: get(r,"Nome"), R: get(r,"R"), RM: get(r,"RM"), Squadra: get(r,"Squadra"),
-      QtA: parseInt(get(r,"QtA")) || 1, FVM: parseInt(get(r,"FVM")) || 0,
-      QtaM: parseInt(get(r,"QtA_M")) || 0, QtiM: parseInt(get(r,"QtI_M")) || 0, FvmM: parseInt(get(r,"FVM_M")) || 0,
-      Rigorista: parseInt(get(r,"Rigorista")) || 0,
+      QtA:  parseInt(get(r,"QtA"))   || 1,
+      FVM:  parseInt(get(r,"FVM"))   || 0,
+      // Lista_Enriched usa QtA/QtI/FVM diretti; riassuntivo usa QtA_M/QtI_M/FVM_M
+      QtaM: parseInt(get(r,"QtA_M") || get(r,"QtA")) || 0,
+      QtiM: parseInt(get(r,"QtI_M") || get(r,"QtI")) || 0,
+      FvmM: parseInt(get(r,"FVM_M") || get(r,"FVM")) || 0,
+      Rigorista:    parseInt(get(r,"Rigorista")) || 0,
       Nuovo_Arrivo: get(r,"Nuovo_Arrivo"),
-      Fm_2526: get(r,"Fm_2526"),
-      Pv_2526: get(r,"Pv_2526"), Gf_2526: get(r,"Gf_2526"),
-      Ass_2526: get(r,"Ass_2526"), Amm_2526: get(r,"Amm_2526")
+      // stat fanta — accetta sia nomi enriched (FM/Pv/Gol/Assist) sia originali (Fm_2526/Pv_2526/...)
+      Fm_2526:  get(r,"FM")     || get(r,"Fm_2526"),
+      Pv_2526:  get(r,"Pv")    || get(r,"Pv_2526"),
+      Gf_2526:  get(r,"Gol")   || get(r,"Gf_2526"),
+      Ass_2526: get(r,"Assist")|| get(r,"Ass_2526"),
+      Amm_2526: get(r,"Amm")   || get(r,"Amm_2526"),
+      Esp_2526: get(r,"Esp")   || get(r,"Esp_2526"),
+      Mv_2526:  get(r,"Mv")    || get(r,"Mv_2526"),
+      Gs_2526:  get(r,"GolSubiti") || get(r,"Gs_2526"),
+      // understat
+      xG:       get(r,"xG"),  xA:    get(r,"xA"),
+      xG90:     get(r,"xG90"),xA90:  get(r,"xA90"),
+      xG_diff:  get(r,"xG_diff"),
+      // fbref
+      fb_90s:   get(r,"90s")  || get(r,"fb_90s"),
+      Efficienza: get(r,"Efficienza"),
     }));
 }
 

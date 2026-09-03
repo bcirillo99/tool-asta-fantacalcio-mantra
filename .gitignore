@@ -22,5 +22,6 @@
 # Tieni il gitignore stesso
 !.gitignore
 
-# Escludi il virtualenv (pieno di .py di terze parti)
+# Tieni script Python del progetto (ma non il virtualenv)
+!*.py
 .venv/
