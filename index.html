@@ -127,8 +127,12 @@
       <button data-l="rows">▤ Verticale</button>
       <button data-l="cols">▥ Colonne</button>
     </div>
+    <button id="board-target-btn" title="Modalità punta: click su un giocatore lo segna come obiettivo">🎯 Punta</button>
+    <label id="consigli-btn" for="consigli-input" title="Carica Lista_Consigli_2627.csv (usa solo se non hai un server locale)">📥 Consigli</label>
+    <input type="file" id="consigli-input" accept=".csv">
     <div id="board-legend">
       <span class="bl-item"><i class="bl-dot avail"></i>disponibile</span>
+      <span class="bl-item"><i class="bl-dot target"></i>obiettivo</span>
       <span class="bl-item"><i class="bl-dot mine"></i>mio</span>
       <span class="bl-item"><i class="bl-dot out"></i>preso</span>
     </div>

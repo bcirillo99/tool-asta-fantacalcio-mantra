@@ -351,11 +351,33 @@ body.resizing { cursor: col-resize; user-select: none; }
 .brow-tag.mine { background: oklch(0.76 0.15 158 / 0.22); color: var(--pos); }
 .brow-tag.out  { background: oklch(0.66 0.20 25 / 0.2); color: var(--neg); }
 
+.brow.target { background: oklch(0.80 0.14 82 / 0.13); border-color: oklch(0.80 0.14 82 / 0.45); }
+.brow.target .brow-name { text-decoration: underline; text-decoration-style: dotted; text-decoration-color: var(--gold); color: var(--gold); }
 .brow.mine { background: oklch(0.76 0.15 158 / 0.12); border-color: oklch(0.76 0.15 158 / 0.4); }
 .brow.mine .brow-name { color: var(--pos); }
+.bl-dot.target { background: var(--gold); }
+#board-target-btn {
+  padding: 7px 14px; border-radius: var(--r); border: 1px solid var(--border);
+  background: var(--surface-2); color: var(--text-dim); cursor: pointer;
+  font-size: 12px; font-weight: 600; transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+#board-target-btn:hover { border-color: var(--gold); color: var(--gold); }
+#board-target-btn.active { background: oklch(0.80 0.14 82 / 0.18); border-color: var(--gold); color: var(--gold); }
+#consigli-input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; pointer-events: none; }
+#consigli-btn {
+  display: none; padding: 7px 14px; border-radius: var(--r); border: 1px solid oklch(0.66 0.18 290 / 0.5);
+  background: var(--surface-2); color: #a78bfa; cursor: pointer;
+  font-size: 12px; font-weight: 600; transition: background 0.15s, border-color 0.15s;
+}
+#consigli-btn.visible { display: inline-flex; align-items: center; }
+#consigli-btn:hover { background: oklch(0.66 0.18 290 / 0.1); border-color: #a78bfa; }
+#board-grid.target-mode .brow:not(.mine):not(.taken) { cursor: crosshair; }
 .brow.taken { background: oklch(0.66 0.20 25 / 0.1); border-color: oklch(0.66 0.20 25 / 0.35); }
 .brow.taken .brow-name { text-decoration: line-through; text-decoration-color: var(--neg); color: var(--neg); }
 .brow.taken .brow-qta { color: var(--neg); opacity: 0.7; }
+
+.bcol-consigli { border-color: oklch(0.66 0.18 290 / 0.5); }
+.bsec-consigli .bsec-head { background: color-mix(in oklch, #a78bfa 15%, var(--surface)); border-left-color: #a78bfa; }
 
 #board-pop {
   display: none; position: fixed; z-index: 120; min-width: 180px;
